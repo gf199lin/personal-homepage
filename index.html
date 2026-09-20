@@ -1963,6 +1963,11 @@
     .wall-board::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(160deg, rgba(9,13,52,.74) 0%, rgba(9,13,52,.88) 100%); }
     .wall-notes { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 16px 14px; justify-content: center; margin: 0; padding: 0; list-style: none; }
     .wall-empty, .wall-loading { position: relative; z-index: 1; margin: 0; padding: 26px 6px; text-align: center; color: rgba(253,246,226,.62); font-size: 13px; }
+    .wall-more { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+    .wall-more-btn { height: 42px; padding: 0 22px; border: 1.5px solid rgba(253,246,226,.5); border-radius: 999px; background: transparent; color: #fdf6e2; font: inherit; font-size: 13px; font-weight: 700; letter-spacing: .02em; cursor: pointer; transition: background .18s ease, opacity .18s ease; }
+    .wall-more-btn:hover { background: rgba(253,246,226,.12); }
+    .wall-more-btn[disabled] { opacity: .5; cursor: default; background: transparent; }
+    .wall-more-hint { margin: 0; color: rgba(253,246,226,.55); font-size: 12.5px; letter-spacing: .03em; }
     .wall-empty[hidden], .wall-loading[hidden], .wall-preview[hidden], .wall-picked[hidden],
     .wall-talk[hidden], .wall-picker[hidden] { display: none; }
 
@@ -2298,6 +2303,10 @@
           <ul class="wall-notes" id="wallNotes"></ul>
           <p class="wall-loading" id="wallLoading">正在把便签贴上来…</p>
           <p class="wall-empty" id="wallEmpty" hidden>还没有人留言，你可以贴上第一张便签。</p>
+          <div class="wall-more" id="wallMore" hidden>
+            <button class="wall-more-btn" id="wallMoreBtn" type="button">加载更多</button>
+            <p class="wall-more-hint" id="wallMoreHint"></p>
+          </div>
         </div>
 
         <form class="wall-form" id="wallForm" novalidate>
@@ -4410,6 +4419,9 @@
       var wallReplied = document.getElementById('wallReplied');
       var wallLoading = document.getElementById('wallLoading');
       var wallEmpty = document.getElementById('wallEmpty');
+      var wallMore = document.getElementById('wallMore');
+      var wallMoreBtn = document.getElementById('wallMoreBtn');
+      var wallMoreHint = document.getElementById('wallMoreHint');
       var wallForm = document.getElementById('wallForm');
       var nameEl = document.getElementById('wallName');
       var msgEl = document.getElementById('wallMsg');
@@ -4557,11 +4569,11 @@
         if (atTop && wallNotes.firstChild) wallNotes.insertBefore(node, wallNotes.firstChild);
         else wallNotes.appendChild(node);
         shown += 1;
-        wallCount.textContent = String(shown);
+        wallCount.textContent = String(wallTotal === null ? shown : Math.max(wallTotal, shown));
         if (hasReply(row)) {
           replied += 1;
-          wallReplied.textContent = String(replied);
         }
+        wallReplied.textContent = String(wallRepliedAll === null ? replied : Math.max(wallRepliedAll, replied));
       }
 
       /* ---------------- 点开便签：对话弹层 ---------------- */
@@ -4708,23 +4720,103 @@
         if (picker && !picker.hidden) { e.preventDefault(); e.stopPropagation(); closePicker(); }
       }, true);
 
-      /* ---------------- 读取现有留言 ---------------- */
-      wallLoading.hidden = false;
-      fetch(WALL_URL + '/rest/v1/wall_notes?select=id,name,message,photo_ref,photo_path,reply,replied_at,created_at'
-            + '&hidden=eq.false&order=created_at.desc&limit=' + SHOW_LIMIT, {
-        headers: { 'apikey': WALL_KEY, 'Authorization': 'Bearer ' + WALL_KEY }
-      }).then(function (res) {
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        return res.json();
-      }).then(function (rows) {
-        wallLoading.hidden = true;
-        if (!rows || !rows.length) { wallEmpty.hidden = false; return; }
-        for (var i = 0; i < rows.length; i++) addNote(rows[i], false);
-      }).catch(function () {
-        wallLoading.hidden = true;
-        wallEmpty.hidden = false;
-        wallEmpty.textContent = '留言墙还没接上后台（先在 Supabase 跑一次 supabase-wall-notes.sql），先贴一张试试也行。';
-      });
+      /* ---------------- 读取现有留言：先来一屏，剩下的点「加载更多」 ---------------- */
+      var wallOffset = 0;          /* 已经取到第几条（分页游标） */
+      var wallTotal = null;        /* 后台里的真实便签条数 */
+      var wallRepliedAll = null;   /* 后台里的真实已回复条数 */
+      var wallSeen = {};           /* 去重：翻页路上万一有人同时贴了新便签 */
+      var wallBusy = false;        /* 一次只发一个请求 */
+      var wallEnded = false;       /* 后台确实没有更早的了 */
+
+      function refreshMore() {
+        if (!wallMore || !wallMoreBtn) return;
+        var left = (wallTotal === null) ? null : (wallTotal - shown);
+        if (wallEnded || (left !== null && left <= 0)) {
+          if (shown > 0) {
+            wallMore.hidden = false;
+            wallMoreBtn.hidden = true;
+            wallMoreHint.textContent = '已经到底了 · 共 ' + shown + ' 张便签';
+          } else {
+            wallMore.hidden = true;
+          }
+          return;
+        }
+        if (shown === 0) { wallMore.hidden = true; return; }
+        wallMore.hidden = false;
+        wallMoreBtn.hidden = false;
+        wallMoreBtn.disabled = false;
+        wallMoreHint.textContent = (left === null)
+          ? ('已经贴上来 ' + shown + ' 张')
+          : ('已显示最新 ' + shown + ' 张 · 还有 ' + left + ' 张');
+      }
+
+      /* 轻量取一次 id/reply，用来算真实的总数和已回复数（不拉正文） */
+      function loadWallCount() {
+        fetch(WALL_URL + '/rest/v1/wall_notes?select=id,reply&hidden=eq.false&limit=2000', {
+          headers: { 'apikey': WALL_KEY, 'Authorization': 'Bearer ' + WALL_KEY }
+        }).then(function (res) {
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return res.json();
+        }).then(function (rows) {
+          if (!rows) return;
+          wallTotal = rows.length;
+          var answered = 0;
+          for (var i = 0; i < rows.length; i++) { if (hasReply(rows[i])) answered += 1; }
+          wallRepliedAll = answered;
+          wallCount.textContent = String(Math.max(wallTotal, shown));
+          wallReplied.textContent = String(Math.max(answered, replied));
+          refreshMore();
+        }).catch(function () { /* 统计失败不影响便签本身 */ });
+      }
+
+      function loadWallNotes(isMore) {
+        if (wallBusy) return;
+        wallBusy = true;
+        if (isMore) {
+          wallMoreBtn.disabled = true;
+          wallMoreBtn.textContent = '正在取…';
+        } else {
+          wallLoading.hidden = false;
+        }
+        fetch(WALL_URL + '/rest/v1/wall_notes?select=id,name,message,photo_ref,photo_path,reply,replied_at,created_at'
+              + '&hidden=eq.false&order=created_at.desc&limit=' + SHOW_LIMIT + '&offset=' + wallOffset, {
+          headers: { 'apikey': WALL_KEY, 'Authorization': 'Bearer ' + WALL_KEY }
+        }).then(function (res) {
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return res.json();
+        }).then(function (rows) {
+          wallBusy = false;
+          wallLoading.hidden = true;
+          wallMoreBtn.textContent = '加载更多';
+          if (rows && rows.length) {
+            for (var i = 0; i < rows.length; i++) {
+              var key = 'n' + rows[i].id;
+              if (wallSeen[key]) continue;
+              wallSeen[key] = 1;
+              addNote(rows[i], false);
+            }
+            wallOffset += rows.length;
+          } else {
+            wallEnded = true;      /* 后台确实没有更早的了 */
+          }
+          if (!shown) wallEmpty.hidden = false;
+          refreshMore();
+        }).catch(function () {
+          wallBusy = false;
+          wallLoading.hidden = true;
+          wallMoreBtn.disabled = false;
+          wallMoreBtn.textContent = '加载更多';
+          if (!isMore && !shown) {
+            wallEmpty.hidden = false;
+            wallEmpty.textContent = '留言墙还没接上后台（先在 Supabase 跑一次 supabase-wall-notes.sql），先贴一张试试也行。';
+          }
+          refreshMore();
+        });
+      }
+
+      if (wallMoreBtn) wallMoreBtn.addEventListener('click', function () { loadWallNotes(true); });
+      loadWallNotes(false);
+      loadWallCount();
 
       /* ---------------- 访客自己传一张照片：本地压缩后再上传 ---------------- */
       function clearPhoto() {
@@ -4891,6 +4983,7 @@
             created_at: new Date().toISOString()
           }, true);
           wallEmpty.hidden = true;
+          loadWallCount();
           restoreButton();
           msgEl.value = '';
           nameEl.value = '';
