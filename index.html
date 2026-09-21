@@ -1968,6 +1968,17 @@
     .wall-more-btn:hover { background: rgba(253,246,226,.12); }
     .wall-more-btn[disabled] { opacity: .5; cursor: default; background: transparent; }
     .wall-more-hint { margin: 0; color: rgba(253,246,226,.55); font-size: 12.5px; letter-spacing: .03em; }
+
+    /* 收起留言墙：和高中的「收起照片墙」同一套逻辑 —— 固定左下角，滚到墙上任何位置都能随手按；
+       位置比它高一格，两者万一同时出现也不会叠在一起。桌面端另有 Esc 快捷键。 */
+    .wall-collapse { position: fixed; left: clamp(14px, 2.4vw, 30px); bottom: calc(clamp(14px, 2.4vw, 30px) + 58px); z-index: 901; display: inline-flex; align-items: center; gap: 9px; height: 46px; padding: 0 19px 0 17px; border: 1.5px solid rgba(253,246,226,.5); border-radius: 999px; background: #1d2379; color: #fdf6e2; font: inherit; font-size: 13.5px; font-weight: 700; letter-spacing: .02em; cursor: pointer; box-shadow: 0 12px 30px rgba(29,35,121,.34); -webkit-tap-highlight-color: transparent; transition: background .18s ease, transform .2s ease; }
+    .wall-collapse[hidden] { display: none; }
+    .wall-collapse:hover { background: #2a3189; transform: translateY(-2px); }
+    .wall-collapse:active { transform: translateY(0) scale(.97); }
+    .wall-collapse:focus-visible { outline: 2px solid #1d2379; outline-offset: 3px; }
+    .wall-collapse kbd { padding: 2px 7px; border: 1px solid rgba(253,246,226,.5); border-radius: 6px; background: rgba(253,246,226,.14); font: inherit; font-size: 11.5px; font-weight: 700; }
+    .wall-note[hidden] { display: none; }
+    @media (max-width: 640px) { .wall-collapse { height: 42px; padding: 0 16px 0 14px; font-size: 13px; bottom: calc(clamp(14px, 2.4vw, 30px) + 52px); } .wall-collapse kbd { display: none; } }
     .wall-empty[hidden], .wall-loading[hidden], .wall-preview[hidden], .wall-picked[hidden],
     .wall-talk[hidden], .wall-picker[hidden] { display: none; }
 
@@ -2344,6 +2355,8 @@
         </form>
         <p class="wall-note-safe">留言和照片都是公开的：贴上来之后所有访客都能看到，你的问题也会出现在这里等我的回答。自己传的照片会先在本地压缩（长边 1600px）再上传，只有图片、单张不超过 3 MB。</p>
       </section>
+
+      <button class="wall-collapse" id="wallCollapse" type="button" aria-controls="wallNotes" title="快捷键 Esc" hidden>收起留言墙 <kbd>Esc</kbd></button>
 
       <div class="wall-talk" id="wallTalk" hidden role="dialog" aria-modal="true" aria-labelledby="wallTalkWho">
         <div class="wall-talk-panel" role="document">
@@ -4412,7 +4425,8 @@
       var MAX_SIDE = 1600;          /* 访客上传的照片，长边压到这个尺寸 */
       var PHOTO_QUALITY = 0.82;     /* JPEG 质量，和高中照片墙同一套参数 */
       var RAW_LIMIT = 12 * 1024 * 1024;  /* 原始文件上限：超过就不折腾了 */
-      var SHOW_LIMIT = 24;          /* 一次最多显示多少张便签 */
+      var SHOW_LIMIT = 8;           /* 一次拉多少张便签（点一下「加载更多」就再来这么多） */
+      var WALL_COVER = 8;           /* 封面只显示最新 8 张，剩下的点「加载更多」才铺开 */
 
       var wallNotes = document.getElementById('wallNotes');
       var wallCount = document.getElementById('wallCount');
@@ -4452,6 +4466,8 @@
       var talkRepliedAt = document.getElementById('wallTalkReplied');
       var talkPending = document.getElementById('wallTalkPending');
       var talkReplyBox = talkReply ? talkReply.parentNode : null;
+      var wallCollapse = document.getElementById('wallCollapse');
+      var wallSection = document.getElementById('guestwall');
       if (!wallForm || !wallNotes) return;
 
       var IDLE_TEXT = submitBtn.textContent;
@@ -4717,7 +4733,14 @@
       document.addEventListener('keydown', function (e) {
         if (e.key !== 'Escape' && e.key !== 'Esc') return;
         if (talk && !talk.hidden) { e.preventDefault(); e.stopPropagation(); closeTalk(); return; }
-        if (picker && !picker.hidden) { e.preventDefault(); e.stopPropagation(); closePicker(); }
+        if (picker && !picker.hidden) { e.preventDefault(); e.stopPropagation(); closePicker(); return; }
+        /* 弹层都没开时：留言墙铺开了就按下 Esc 收回封面；
+           光标在输入框里时不响应，免得正在填留言时页面突然跳走。 */
+        if (wallVisible > WALL_COVER) {
+          var el = e.target, tag = (el && el.tagName ? el.tagName : '').toUpperCase();
+          if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (el && el.isContentEditable)) return;
+          e.preventDefault(); e.stopPropagation(); collapseWall();
+        }
       }, true);
 
       /* ---------------- 读取现有留言：先来一屏，剩下的点「加载更多」 ---------------- */
@@ -4727,27 +4750,49 @@
       var wallSeen = {};           /* 去重：翻页路上万一有人同时贴了新便签 */
       var wallBusy = false;        /* 一次只发一个请求 */
       var wallEnded = false;       /* 后台确实没有更早的了 */
+      var wallVisible = WALL_COVER;/* 现在最多露几张：封面 8 张，每点一次「加载更多」多露 8 张 */
+
+      /* 便签都在 DOM 里，只是按 wallVisible 决定露出来几张；
+         收起来的那些留在原地，再点「加载更多」能立刻放出来，不必重新联网。 */
+      function applyWallVisibility() {
+        var kids = wallNotes.children;
+        for (var i = 0; i < kids.length; i++) {
+          if (i >= wallVisible) kids[i].hidden = true;
+          else kids[i].hidden = false;
+        }
+      }
 
       function refreshMore() {
         if (!wallMore || !wallMoreBtn) return;
-        var left = (wallTotal === null) ? null : (wallTotal - shown);
-        if (wallEnded || (left !== null && left <= 0)) {
-          if (shown > 0) {
-            wallMore.hidden = false;
-            wallMoreBtn.hidden = true;
-            wallMoreHint.textContent = '已经到底了 · 共 ' + shown + ' 张便签';
-          } else {
-            wallMore.hidden = true;
-          }
-          return;
+        var left = (wallTotal === null) ? null : Math.max(0, wallTotal - shown);
+        var tucked = Math.max(0, shown - wallVisible);          /* 已经取回来、但被收起来的 */
+        var moreLeft = (left === null) ? null : (left + tucked);
+        var allIn = wallEnded || (left !== null && left <= 0 && tucked <= 0);
+
+        wallMore.hidden = (shown === 0);
+
+        if (shown > 0 && !allIn) {
+          wallMoreBtn.hidden = false;
+          wallMoreBtn.disabled = false;
+          wallMoreHint.textContent = (moreLeft === null)
+            ? ('已显示最新 ' + wallVisible + ' 张')
+            : ('已显示最新 ' + wallVisible + ' 张 · 还有 ' + moreLeft + ' 张');
+        } else if (shown > 0) {
+          wallMoreBtn.hidden = true;
+          wallMoreHint.textContent = '已经到底了 · 共 ' + shown + ' 张便签';
         }
-        if (shown === 0) { wallMore.hidden = true; return; }
-        wallMore.hidden = false;
-        wallMoreBtn.hidden = false;
-        wallMoreBtn.disabled = false;
-        wallMoreHint.textContent = (left === null)
-          ? ('已经贴上来 ' + shown + ' 张')
-          : ('已显示最新 ' + shown + ' 张 · 还有 ' + left + ' 张');
+
+        /* 收起按钮只在「铺开超过封面」时才出现 */
+        if (wallCollapse) wallCollapse.hidden = (wallVisible <= WALL_COVER);
+      }
+
+      /* 「收起留言墙」：回到封面状态（最新 8 张），并滚回留言墙顶部 */
+      function collapseWall() {
+        if (wallVisible <= WALL_COVER) return;
+        wallVisible = WALL_COVER;
+        applyWallVisibility();
+        refreshMore();
+        if (wallSection && wallSection.scrollIntoView) wallSection.scrollIntoView({ block: 'start' });
       }
 
       /* 轻量取一次 id/reply，用来算真实的总数和已回复数（不拉正文） */
@@ -4799,6 +4844,8 @@
           } else {
             wallEnded = true;      /* 后台确实没有更早的了 */
           }
+          wallVisible = shown;          /* 新取回来的这批直接露出来 */
+          applyWallVisibility();
           if (!shown) wallEmpty.hidden = false;
           refreshMore();
         }).catch(function () {
@@ -4814,7 +4861,18 @@
         });
       }
 
-      if (wallMoreBtn) wallMoreBtn.addEventListener('click', function () { loadWallNotes(true); });
+      if (wallMoreBtn) wallMoreBtn.addEventListener('click', function () {
+        if (wallBusy) return;
+        var tucked = shown - wallVisible;
+        if (tucked > 0) {                       /* 先把上次收起来的一批放出来，不用等网络 */
+          wallVisible = Math.min(shown, wallVisible + WALL_COVER);
+          applyWallVisibility();
+          refreshMore();
+          return;
+        }
+        loadWallNotes(true);
+      });
+      if (wallCollapse) wallCollapse.addEventListener('click', collapseWall);
       loadWallNotes(false);
       loadWallCount();
 
