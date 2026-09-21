@@ -1036,6 +1036,46 @@
       .chat-card .suggestions { border-right: 0; border-bottom: 1px solid rgba(29,35,121,.14); }
     }
 
+    /* 手机端：预设问题一行横滑 + 明确的滑动提示（桌面端不显示提示行） */
+    .suggest-hint { display: none; }
+
+    @media (max-width: 820px) {
+      .chat-card {
+        grid-template-rows: auto auto auto minmax(360px, auto) auto;
+        grid-template-areas:
+          "head"
+          "suggestions"
+          "suggest-hint"
+          "messages"
+          "composer";
+      }
+      /* 提示行并入「你可以问我」色块：同米色底，下边框挪到提示行 */
+      .chat-card .suggestions { border-right: 0; border-bottom: 0; }
+      .chat-card .suggest-hint {
+        display: block;
+        grid-area: suggest-hint;
+        margin: 0;
+        padding: 0 20px 12px;
+        border-bottom: 1px solid rgba(29,35,121,.14);
+        color: rgba(29,35,121,.62);
+        background: #f6eed8;
+        font-size: 11.5px;
+        font-weight: 700;
+        letter-spacing: .02em;
+        line-height: 1.5;
+      }
+      .chat-card .suggest-hint[hidden] { display: none; }
+      /* 右侧渐隐：只在「还能继续滑」时出现，滑到底自动撓掉 */
+      .chat-card .suggestions.is-scrollable {
+        -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 52px), transparent 100%);
+        mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 52px), transparent 100%);
+      }
+      .chat-card .suggestions.is-scrollable.is-end {
+        -webkit-mask-image: none;
+        mask-image: none;
+      }
+    }
+
     @media (max-width: 520px) {
       nav { border-bottom: 0; }
       .profile-card > .avatar-row { width: 100%; height: auto; aspect-ratio: 1 / 1; }
@@ -2245,6 +2285,7 @@
             <button class="suggestion" type="button">你耳钉咋样了？</button>
             <button class="suggestion" type="button">最近在看什么？</button>
           </div>
+          <p class="suggest-hint" id="suggestHint" hidden>左右滑动看全部 7 个问题 →</p>
 
           <form class="composer" id="chatForm">
             <input id="question" autocomplete="off" maxlength="100" placeholder="问我点什么吧…" aria-label="输入问题" />
@@ -2628,6 +2669,44 @@
     suggestionButtons.forEach(button => {
       button.addEventListener('click', () => ask(button.textContent));
     });
+
+    /* 手机端：预设问题一行横滑，右侧渐隐 + 动态提示「还有几个没看到」 */
+    (function () {
+      const box = document.querySelector('.chat-card .suggestions');
+      const hint = document.getElementById('suggestHint');
+      if (!box || !hint) return;
+      const chips = Array.prototype.slice.call(box.querySelectorAll('.suggestion'));
+      const total = chips.length;
+
+      function refreshSuggestHint() {
+        const max = box.scrollWidth - box.clientWidth;
+        if (max <= 6) {   /* 无横向溢出（桌面端 / 宽屏）：不提示、不渐隐 */
+          hint.hidden = true;
+          box.classList.remove('is-scrollable');
+          box.classList.remove('is-end');
+          return;
+        }
+        const atEnd = box.scrollLeft >= max - 6;
+        const boxRight = box.getBoundingClientRect().right;
+        let rest = 0;
+        chips.forEach(function (c) {
+          if (c.getBoundingClientRect().right > boxRight + 2) rest++;
+        });
+        box.classList.add('is-scrollable');
+        box.classList.toggle('is-end', atEnd);
+        hint.hidden = false;
+        hint.textContent = (atEnd || rest === 0)
+          ? '一共 ' + total + ' 个问题，都在这儿了'
+          : '一共 ' + total + ' 个问题，还有 ' + rest + ' 个在右边 → 左右滑动';
+      }
+
+      box.addEventListener('scroll', refreshSuggestHint, { passive: true });
+      window.addEventListener('resize', refreshSuggestHint);
+      window.addEventListener('orientationchange', refreshSuggestHint);
+      window.addEventListener('load', refreshSuggestHint);
+      refreshSuggestHint();
+      window.setTimeout(refreshSuggestHint, 400);   /* 字体/布局稳定后再算一次 */
+    })();
   </script>
 <script>
   (function () {
