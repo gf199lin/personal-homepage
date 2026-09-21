@@ -2045,11 +2045,11 @@
     .wall-note-video img, .wall-note-video video { display: block; width: 100%; height: 116px; object-fit: cover; }
     .wall-video-badge { position: absolute; left: 6px; bottom: 6px; display: inline-flex; align-items: center; height: 19px; padding: 0 7px; border-radius: 999px; background: rgba(9,12,40,.74); color: #fdf6e2; font-size: 10.5px; font-weight: 700; letter-spacing: .02em; }
     /* 对话状态标记 */
-    .wall-note-flags { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 10px 0 0; font-size: 11px; }
+    .wall-note-flags { display: flex; align-items: center; justify-content: flex-start; gap: 8px; margin: 10px 0 0; font-size: 11px; }
     .wall-note-flag { display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 999px; font-weight: 700; letter-spacing: .02em; }
     .wall-note-flag.is-done { background: rgba(29,35,121,.14); color: #1d2379; }
     .wall-note-flag.is-wait { background: rgba(43,47,91,.09); color: rgba(43,47,91,.62); }
-    .wall-note-open { flex: none; color: rgba(43,47,91,.58); font-weight: 700; }
+    .wall-note-open { flex: none; margin-left: auto; color: rgba(43,47,91,.58); font-weight: 700; }
 
     /* 贴便签区 */
     .wall-form { margin-top: 22px; padding: clamp(18px, 2.4vw, 26px); border: 1px dashed rgba(253,246,226,.3); border-radius: 20px; background: rgba(253,246,226,.06); }
@@ -2116,6 +2116,38 @@
     .wall-talk-a-when { font-weight: 600; color: rgba(29,35,121,.6); font-size: 11.5px; font-variant-numeric: tabular-nums; }
     .wall-talk-a-text { margin: 0; font-size: 14.5px; line-height: 1.85; white-space: pre-wrap; word-break: break-word; }
     .wall-talk-pending { margin: 18px 0 0; padding: 15px 18px; border: 1px dashed rgba(29,35,121,.3); border-radius: 16px; color: rgba(43,47,91,.66); font-size: 13px; line-height: 1.8; }
+
+    /* ================= 便签里：访客评论（互相聊） ================= */
+    .wall-cmts { margin-top: 22px; padding-top: 18px; border-top: 1px dashed rgba(29,35,121,.22); }
+    .wall-cmts-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin: 0 0 12px; color: #1d2379; font-size: 12.5px; font-weight: 800; letter-spacing: .04em; }
+    .wall-cmts-count { font-weight: 600; color: rgba(29,35,121,.62); font-size: 11.5px; font-variant-numeric: tabular-nums; }
+    .wall-cmts-list { display: grid; gap: 10px; margin: 0 0 4px; padding: 0; list-style: none; }
+    .wall-cmt { padding: 11px 13px 12px; border-radius: 14px; background: #fff; box-shadow: 0 5px 16px rgba(3,5,26,.08); }
+    .wall-cmt-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin: 0 0 6px; color: rgba(43,47,91,.62); font-size: 11.5px; }
+    .wall-cmt-who { color: #1d2379; font-size: 12.5px; font-weight: 800; }
+    .wall-cmt-when { font-variant-numeric: tabular-nums; }
+    .wall-cmt-text { margin: 0; font-size: 14px; line-height: 1.8; white-space: pre-wrap; word-break: break-word; }
+    .wall-cmt-photo { margin: 9px 0 0; }
+    .wall-cmt-photo img { display: block; max-width: 100%; max-height: 300px; border-radius: 10px; background: #e9e3d2; }
+    .wall-cmts-empty { margin: 0 0 12px; color: rgba(43,47,91,.6); font-size: 12.5px; line-height: 1.8; }
+    .wall-cmts-form { display: grid; gap: 10px; margin-top: 14px; padding: 14px 15px 16px; border-radius: 16px; background: #eef1fb; }
+    .wall-cmts-form input[type="text"], .wall-cmts-form textarea { display: block; width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid rgba(29,35,121,.2); border-radius: 11px; background: #fff; color: #2b2f5b; font: inherit; font-size: 13.5px; line-height: 1.7; }
+    .wall-cmts-form input[type="text"]::placeholder, .wall-cmts-form textarea::placeholder { color: rgba(43,47,91,.42); }
+    .wall-cmts-form textarea { min-height: 66px; resize: vertical; }
+    .wall-cmts-form input[type="text"]:focus, .wall-cmts-form textarea:focus { outline: 2px solid rgba(29,35,121,.6); outline-offset: 1px; }
+    .wall-cmts-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+    .wall-cmts-hint { color: rgba(43,47,91,.62); font-size: 12px; }
+    /* 复用贴便签区那套控件，但弹层是奶白底，必须把「奶白字 + 透明底」改成深色字 */
+    .wall-cmts-form .wall-photo-pick { height: 38px; padding: 0 16px; border-color: rgba(29,35,121,.28); background: #fff; color: #1d2379; font-size: 12.5px; }
+    .wall-cmts-form .wall-photo-pick:hover { background: #eef1fb; }
+    .wall-cmts-form .wall-photo-input:focus-visible + .wall-photo-pick { outline: 2px solid #1d2379; outline-offset: 2px; }
+    .wall-cmts-form .wall-preview-drop { height: 38px; padding: 0 15px; border-color: rgba(29,35,121,.24); background: #fff; color: rgba(29,35,121,.82); }
+    .wall-cmts-form .wall-preview-drop:hover { background: #eef1fb; }
+    .wall-cmts-form .wall-submit { justify-self: start; height: 42px; padding: 0 24px; border-color: #1d2379; background: #1d2379; color: #fdf6e2; font-size: 13px; }
+    .wall-cmts-form .wall-submit:hover:not(:disabled) { transform: none; opacity: .9; }
+    .wall-cmts-form .wall-status { flex: none; color: rgba(43,47,91,.64); font-size: 12px; }
+    .wall-cmts-form .wall-status.is-ok { color: #1f7a4d; }
+    .wall-cmts-form .wall-status.is-err { color: #b23a2b; }
 
     /* ================= 挑一张我的照片：选图弹层 ================= */
     .wall-picker { position: fixed; inset: 0; z-index: 975; display: grid; place-items: center; padding: clamp(14px, 3vh, 42px) clamp(12px, 4vw, 40px); background: rgba(3,5,26,.93); }
@@ -2440,6 +2472,23 @@
               <p class="wall-talk-a-text" id="wallTalkReply"></p>
             </div>
             <p class="wall-talk-pending" id="wallTalkPending" hidden>这条我还没回答。看到就会补上 —— 你可以过几天再来点开看看。</p>
+            <div class="wall-cmts" id="wallCmts">
+              <p class="wall-cmts-head"><span>访客评论</span><span class="wall-cmts-count" id="wallCmtsHeadCount"></span></p>
+              <ul class="wall-cmts-list" id="wallCmtsList"></ul>
+              <p class="wall-cmts-empty" id="wallCmtsEmpty" hidden>还没有人评论，来说第一句吧。</p>
+              <form class="wall-cmts-form" id="wallCmtsForm">
+                <input id="wallCmtsName" type="text" maxlength="24" autocomplete="off" placeholder="名字（不填就是匿名）" aria-label="评论里的名字" />
+                <textarea id="wallCmtsMsg" maxlength="200" rows="2" placeholder="说点什么…（最多 200 字，不能发链接）" aria-label="评论内容"></textarea>
+                <div class="wall-cmts-row">
+                  <input class="wall-photo-input" id="wallCmtsPhoto" type="file" accept="image/*" />
+                  <label class="wall-photo-pick" for="wallCmtsPhoto">配一张图</label>
+                  <button class="wall-preview-drop" id="wallCmtsPhotoClear" type="button" hidden>去掉配图</button>
+                  <span class="wall-cmts-hint" id="wallCmtsHint"></span>
+                </div>
+                <button class="wall-submit" id="wallCmtsSend" type="submit">发评论</button>
+                <p class="wall-status" id="wallCmtsStatus"></p>
+              </form>
+            </div>
           </div>
         </div>
       </div>
@@ -4742,6 +4791,11 @@
         flag.className = 'wall-note-flag ' + (done ? 'is-done' : 'is-wait');
         flag.textContent = done ? '已回答' : '等我回答';
         flags.appendChild(flag);
+        var cmtTag = document.createElement('span');
+        cmtTag.className = 'wall-note-cmt';
+        cmtTag.setAttribute('data-cmt', String(row.id));
+        cmtTag.hidden = true;
+        flags.appendChild(cmtTag);
         var open = document.createElement('span');
         open.className = 'wall-note-open';
         open.textContent = '点开看对话';
@@ -4806,6 +4860,7 @@
         talkRepliedAt.textContent = done ? fmtTime(row.replied_at) : '';
         if (talkReplyBox) talkReplyBox.hidden = !done;
         talkPending.hidden = done;
+        openComments(row);
 
         lastFocus = node || document.activeElement;
         talk.hidden = false;
@@ -5036,6 +5091,7 @@
           applyWallVisibility();
           if (!shown) wallEmpty.hidden = false;
           refreshMore();
+          loadCmtCounts();
         }).catch(function () {
           wallBusy = false;
           wallLoading.hidden = true;
@@ -5237,6 +5293,337 @@
         });
       }
       if (videoClear) videoClear.addEventListener('click', function () { clearVideo(); setStatus(''); });
+
+      /* ================= 访客评论：便签里的互相聊 ================= */
+      var CMT_URL = WALL_URL + '/rest/v1/wall_comments';
+      var CMT_MAX = 200;                        /* 和数据库 CHECK 一致：200 字 */
+      var CMT_NAME_MAX = 24;
+      var CMT_LINK = /(https?:\/\/|www\.)/i;    /* 和数据库 CHECK 一致：不许带链接 */
+      var CMT_COOLDOWN = 20000;                 /* 同一条便签 20 秒内只发一条（防手滑连点） */
+      var CMT_FAKE_ID = 10000000;               /* 刚贴上去的便签用的是「秒级时间戳」假 id，比任何真 id 都大 */
+      var CMT_HDR = { 'apikey': WALL_KEY, 'Authorization': 'Bearer ' + WALL_KEY };
+      var cmtBox = document.getElementById('wallCmts');
+      var cmtListEl = document.getElementById('wallCmtsList');
+      var cmtEmptyEl = document.getElementById('wallCmtsEmpty');
+      var cmtCountEl = document.getElementById('wallCmtsHeadCount');
+      var cmtForm = document.getElementById('wallCmtsForm');
+      var cmtNameEl = document.getElementById('wallCmtsName');
+      var cmtMsgEl = document.getElementById('wallCmtsMsg');
+      var cmtPhotoEl = document.getElementById('wallCmtsPhoto');
+      var cmtPhotoClear = document.getElementById('wallCmtsPhotoClear');
+      var cmtHintEl = document.getElementById('wallCmtsHint');
+      var cmtSendBtn = document.getElementById('wallCmtsSend');
+      var cmtStatusEl = document.getElementById('wallCmtsStatus');
+      var cmtNoteId = 0;
+      var cmtBusy = false;
+      var cmtBlob = null;
+      var cmtCol = true;                        /* 后台有没有评论表：没跑 V5 脚本时退化成 false */
+      var CMT_BTN_TEXT = cmtSendBtn ? cmtSendBtn.textContent : '发评论';
+
+      function setCmtStatus(text, kind) {
+        if (!cmtStatusEl) return;
+        cmtStatusEl.textContent = text || '';
+        cmtStatusEl.className = 'wall-status' + (kind ? ' is-' + kind : '');
+      }
+
+      function cmtKey() {
+        return Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8) + '.jpg';
+      }
+
+      function clearCmtBlob() {
+        cmtBlob = null;
+        if (cmtPhotoEl) cmtPhotoEl.value = '';
+        if (cmtPhotoClear) cmtPhotoClear.hidden = true;
+        if (cmtHintEl) cmtHintEl.textContent = '';
+      }
+
+      function clearCmtForm() {
+        if (cmtMsgEl) cmtMsgEl.value = '';
+        if (cmtNameEl) cmtNameEl.value = '';
+        clearCmtBlob();
+        setCmtStatus('');
+      }
+
+      function cmtCooldownLeft() {
+        var t = 0;
+        try { t = Number(window.localStorage.getItem('wallCmtAt:' + cmtNoteId) || 0); }
+        catch (err) { t = 0; }
+        var left = Math.ceil((CMT_COOLDOWN - (Date.now() - t)) / 1000);
+        return left > 0 ? left : 0;
+      }
+
+      /* 一条评论：名字 / 时间 / 正文 / 可选配图 —— 一律走 textContent，绝不拼 HTML */
+      function buildCmt(row) {
+        var li = document.createElement('li');
+        li.className = 'wall-cmt';
+        var head = document.createElement('p');
+        head.className = 'wall-cmt-head';
+        var who = document.createElement('span');
+        who.className = 'wall-cmt-who';
+        who.textContent = row.name || '匿名';
+        var when = document.createElement('span');
+        when.className = 'wall-cmt-when';
+        when.textContent = fmtTime(row.created_at);
+        head.appendChild(who);
+        head.appendChild(when);
+        li.appendChild(head);
+        var txt = document.createElement('p');
+        txt.className = 'wall-cmt-text';
+        txt.textContent = row.message || '';
+        li.appendChild(txt);
+        if (row.photo_path) {
+          var fig = document.createElement('figure');
+          fig.className = 'wall-cmt-photo';
+          var im = document.createElement('img');
+          im.src = photoURL(row.photo_path);
+          im.alt = '评论里带的图';
+          im.loading = 'lazy';
+          fig.appendChild(im);
+          li.appendChild(fig);
+        }
+        return li;
+      }
+
+      function markCmtTag(noteId, n) {
+        var tags = document.querySelectorAll('.wall-note-cmt');
+        for (var i = 0; i < tags.length; i++) {
+          if (tags[i].getAttribute('data-cmt') !== String(noteId)) continue;
+          if (n > 0) {
+            tags[i].textContent = '\ud83d\udcac ' + n + ' 条评论';
+            tags[i].hidden = false;
+          } else {
+            tags[i].textContent = '';
+            tags[i].hidden = true;
+          }
+        }
+      }
+
+      function renderCmts(rows) {
+        if (!cmtListEl) return;
+        cmtListEl.innerHTML = '';
+        var list = rows || [];
+        for (var i = 0; i < list.length; i++) cmtListEl.appendChild(buildCmt(list[i]));
+        if (cmtEmptyEl) cmtEmptyEl.hidden = list.length > 0;
+        if (cmtCountEl) cmtCountEl.textContent = list.length ? list.length + ' 条' : '还没有';
+        markCmtTag(cmtNoteId, list.length);
+      }
+
+      /* 一次把墙上这批便签的评论条数都拿回来（只取 note_id 一列，省流量） */
+      function loadCmtCounts() {
+        if (!cmtCol) return;
+        var tags = document.querySelectorAll('.wall-note-cmt');
+        var ids = [];
+        for (var i = 0; i < tags.length; i++) {
+          var id = Number(tags[i].getAttribute('data-cmt'));
+          if (id && id < CMT_FAKE_ID) ids.push(id);
+        }
+        if (!ids.length) return;
+        fetch(CMT_URL + '?select=note_id&hidden=eq.false&note_id=in.(' + ids.join(',') + ')&limit=2000',
+              { headers: CMT_HDR })
+          .then(function (res) {
+            /* 404 / 400 = 后台还没有这张表（没跑 V5 脚本）：整块评论区收起来，别让访客看到报错 */
+            if (res.status === 404 || res.status === 400) {
+              cmtCol = false;
+              if (cmtBox) cmtBox.hidden = true;
+              return [];
+            }
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.json();
+          })
+          .then(function (rows) {
+            var map = {}, i, k;
+            for (i = 0; i < (rows || []).length; i++) {
+              k = String(rows[i].note_id);
+              map[k] = (map[k] || 0) + 1;
+            }
+            for (i = 0; i < tags.length; i++) {
+              k = tags[i].getAttribute('data-cmt');
+              markCmtTag(k, map[String(k)] || 0);
+            }
+          })
+          .catch(function () { /* 条数拿不到不影响便签本身 */ });
+      }
+
+      function loadCmts(quiet) {
+        if (!cmtListEl || !cmtNoteId) { renderCmts([]); return; }
+        if (cmtNoteId >= CMT_FAKE_ID) { renderCmts([]); return; }   /* 刚贴的便签，后台还没落 id */
+        if (!quiet) setCmtStatus('正在取评论…');
+        fetch(CMT_URL + '?select=id,name,message,photo_path,created_at&note_id=eq.' + cmtNoteId
+              + '&hidden=eq.false&order=id.asc&limit=200', { headers: CMT_HDR })
+          .then(function (res) {
+            if (res.status === 404 || res.status === 400) {
+              cmtCol = false;
+              if (cmtBox) cmtBox.hidden = true;
+              return null;
+            }
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.json();
+          })
+          .then(function (rows) {
+            if (rows === null) return;
+            renderCmts(rows);
+            if (!quiet) setCmtStatus('');
+          })
+          .catch(function () {
+            /* quiet：刚发完评论，成功提示别被网络错误盖掉 */
+            if (!quiet) setCmtStatus('评论没取上来（网络问题），过会儿再点开看看。', 'err');
+          });
+      }
+
+      function openComments(row) {
+        cmtNoteId = Number(row && row.id) || 0;
+        if (cmtBox) cmtBox.hidden = !cmtCol;   /* 后台没有评论表时整块收起，别露出空壳 */
+        clearCmtForm();
+        if (!cmtCol) return;
+        var fresh = !cmtNoteId || cmtNoteId >= CMT_FAKE_ID;
+        if (cmtMsgEl) cmtMsgEl.disabled = fresh;
+        if (cmtSendBtn) cmtSendBtn.disabled = fresh;
+        renderCmts([]);
+        if (fresh) {
+          setCmtStatus('这条便签刚贴上去，刷新一下页面就能在下面评论了。');
+          return;
+        }
+        loadCmts();
+      }
+
+      /* 评论配图：先压到 1600px 长边再传，和访客留言的照片走同一套通道 */
+      function uploadCmtPhoto(blob) {
+        var key = cmtKey();
+        return fetch(WALL_URL + '/storage/v1/object/' + WALL_BUCKET + '/' + key, {
+          method: 'POST',
+          headers: {
+            'apikey': WALL_KEY,
+            'Authorization': 'Bearer ' + WALL_KEY,
+            'Content-Type': 'image/jpeg',
+            'cache-control': 'max-age=31536000',
+            'x-upsert': 'false'
+          },
+          body: blob
+        }).then(function (res) {
+          if (!res.ok) {
+            return res.text().then(function (detail) {
+              throw new Error('配图上传失败（HTTP ' + res.status
+                              + (/Bucket not found|not found/i.test(detail) ? '，存储桶 wall-photos 还没建' : '')
+                              + '）');
+            });
+          }
+          return key;
+        });
+      }
+
+      if (cmtPhotoEl) {
+        cmtPhotoEl.addEventListener('change', function () {
+          var file = cmtPhotoEl.files && cmtPhotoEl.files[0];
+          if (!file) return;
+          if (file.type && file.type.indexOf('image/') !== 0) {
+            setCmtStatus('配图只能传图片（JPG / PNG / WebP）。', 'err');
+            clearCmtBlob();
+            return;
+          }
+          if (file.size > RAW_LIMIT) {
+            setCmtStatus('这张配图太大了（超过 12 MB），换一张小一点的。', 'err');
+            clearCmtBlob();
+            return;
+          }
+          setCmtStatus('正在压缩这张配图…');
+          compress(file).then(function (blob) {
+            cmtBlob = blob;
+            if (cmtPhotoClear) cmtPhotoClear.hidden = false;
+            if (cmtHintEl) cmtHintEl.textContent = '配图已就绪 · ' + Math.max(1, Math.round(blob.size / 1024)) + ' KB';
+            setCmtStatus('配图准备好了，可以和评论一起发。', 'ok');
+          }).catch(function (err) {
+            clearCmtBlob();
+            setCmtStatus((err && err.message) || '配图处理失败，换一张试试。', 'err');
+          });
+        });
+      }
+      if (cmtPhotoClear) {
+        cmtPhotoClear.addEventListener('click', function () { clearCmtBlob(); setCmtStatus(''); });
+      }
+
+      if (cmtForm) {
+        cmtForm.addEventListener('submit', function (e) {
+          e.preventDefault();
+          if (cmtBusy) return;
+          var name = cmtNameEl ? (cmtNameEl.value || '').trim() : '';
+          var message = cmtMsgEl ? (cmtMsgEl.value || '').trim() : '';
+
+          if (!cmtNoteId || cmtNoteId >= CMT_FAKE_ID) {
+            setCmtStatus('这条便签刚贴上去，刷新一下页面再来评论吧。', 'err');
+            return;
+          }
+          if (!message) { setCmtStatus('写点什么再发吧。', 'err'); if (cmtMsgEl) cmtMsgEl.focus(); return; }
+          if (message.length > CMT_MAX) {
+            setCmtStatus('评论请控制在 ' + CMT_MAX + ' 字以内（现在 ' + message.length + ' 字）。', 'err');
+            if (cmtMsgEl) cmtMsgEl.focus();
+            return;
+          }
+          if (name.length > CMT_NAME_MAX) {
+            setCmtStatus('名字请控制在 ' + CMT_NAME_MAX + ' 字以内。', 'err');
+            if (cmtNameEl) cmtNameEl.focus();
+            return;
+          }
+          if (CMT_LINK.test(message)) {
+            setCmtStatus('评论里不能发链接（挡广告的），把网址去掉再发。', 'err');
+            return;
+          }
+          var left = cmtCooldownLeft();
+          if (left > 0) { setCmtStatus('刚发过啦，' + left + ' 秒后再发下一条。', 'err'); return; }
+
+          cmtBusy = true;
+          if (cmtSendBtn) { cmtSendBtn.disabled = true; cmtSendBtn.textContent = '正在发…'; }
+          setCmtStatus(cmtBlob ? '正在上传配图…' : '正在发评论…');
+
+          var blob = cmtBlob;
+          var chain = blob ? uploadCmtPhoto(blob) : Promise.resolve(null);
+          chain.then(function (photoPath) {
+            if (photoPath) setCmtStatus('配图传好了，正在发评论…');
+            return fetch(CMT_URL, {
+              method: 'POST',
+              headers: {
+                'apikey': WALL_KEY,
+                'Authorization': 'Bearer ' + WALL_KEY,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=minimal'
+              },
+              body: JSON.stringify({
+                note_id: cmtNoteId,
+                name: name || null,
+                message: message,
+                photo_path: photoPath || null
+              })
+            });
+          }).then(function (res) {
+            if (!res.ok) {
+              return res.text().then(function (detail) {
+                var d = String(detail || '');
+                if (res.status === 404 || /PGRST205|does not exist/i.test(d)) {
+                  throw new Error('评论表还没在后台建好（先在 Supabase 跑一次 supabase-wall-comments.sql）');
+                }
+                if (/wall_comments_no_link/i.test(d)) throw new Error('评论里不能发链接（挡广告的）');
+                if (/wall_comments_message_len/i.test(d)) throw new Error('评论请控制在 ' + CMT_MAX + ' 字以内');
+                if (/wall_comments_name_len/i.test(d)) throw new Error('名字请控制在 ' + CMT_NAME_MAX + ' 字以内');
+                if (/wall_comments_photo_ext|wall_comments_photo_path_len/i.test(d)) throw new Error('配图后台不收，换一张 JPG / PNG');
+                if (/row-level security|42501/i.test(d)) throw new Error('这条被后台拦下了（留言可能已隐藏，或内容不合规）');
+                throw new Error('HTTP ' + res.status + (d ? ' · ' + d.slice(0, 120) : ''));
+              });
+            }
+            return null;
+          }).then(function () {
+            try { window.localStorage.setItem('wallCmtAt:' + cmtNoteId, String(Date.now())); } catch (err) {}
+            cmtBusy = false;
+            if (cmtSendBtn) { cmtSendBtn.disabled = false; cmtSendBtn.textContent = CMT_BTN_TEXT; }
+            clearCmtForm();
+            setCmtStatus('评论发上去了。', 'ok');
+            loadCmts(true);      /* 按后台的真实结果重画一遍，不做乐观渲染（quiet：别盖掉成功提示）*/
+            loadCmtCounts();
+          }).catch(function (err) {
+            cmtBusy = false;
+            if (cmtSendBtn) { cmtSendBtn.disabled = false; cmtSendBtn.textContent = CMT_BTN_TEXT; }
+            setCmtStatus('没发出去（' + ((err && err.message) || '网络异常') + '）。写的内容还在，再点一次「发评论」就能重试。', 'err');
+          });
+        });
+      }
 
       function uploadPhoto(blob) {
         var key = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8) + '.jpg';
