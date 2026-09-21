@@ -2040,6 +2040,10 @@
     .wall-note-shots { display: flex; gap: 5px; margin-bottom: 9px; }
     .wall-note-shots img { display: block; flex: 1 1 0; width: 100%; height: 92px; object-fit: cover; border-radius: 2px; background: #e9e3d2; }
     .wall-note-shots.one img { height: 116px; }
+    /* 便签上的视频：只放封面帧 + ▶ 角标，点开便签才播（墙上不加载视频本体） */
+    .wall-note-video { position: relative; margin-bottom: 9px; border-radius: 2px; overflow: hidden; background: #0d1130; }
+    .wall-note-video img, .wall-note-video video { display: block; width: 100%; height: 116px; object-fit: cover; }
+    .wall-video-badge { position: absolute; left: 6px; bottom: 6px; display: inline-flex; align-items: center; height: 19px; padding: 0 7px; border-radius: 999px; background: rgba(9,12,40,.74); color: #fdf6e2; font-size: 10.5px; font-weight: 700; letter-spacing: .02em; }
     /* 对话状态标记 */
     .wall-note-flags { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 10px 0 0; font-size: 11px; }
     .wall-note-flag { display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 999px; font-weight: 700; letter-spacing: .02em; }
@@ -2067,6 +2071,13 @@
     .wall-preview-drop { height: 36px; padding: 0 15px; border: 1px solid rgba(253,246,226,.36); border-radius: 999px; background: transparent; color: rgba(253,246,226,.86); font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; }
     .wall-preview-drop:hover { background: rgba(253,246,226,.12); }
     .wall-preview-hint { color: rgba(253,246,226,.6); font-size: 12px; }
+    /* 访客传视频：预览 + 大小时长提示 */
+    .wall-video-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+    .wall-video-preview { display: flex; flex: 1 1 100%; flex-wrap: wrap; align-items: flex-start; gap: 12px; }
+    .wall-video-preview[hidden] { display: none; }   /* display:flex 会盖掉浏览器默认的 [hidden]，必须显式写一行 */
+    .wall-video-preview video { display: block; width: 210px; max-width: 100%; max-height: 150px; border: 1px solid rgba(253,246,226,.3); border-radius: 10px; background: #000; }
+    .wall-video-side { display: flex; flex-direction: column; align-items: flex-start; gap: 9px; }
+    .wall-video-hint { color: rgba(253,246,226,.6); font-size: 12px; line-height: 1.6; }
     /* 已挑中的「我的一张照片」 */
     .wall-picked { display: flex; flex: 1 1 100%; flex-wrap: wrap; align-items: center; gap: 12px; }
     .wall-picked img { display: block; width: 76px; height: 57px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(253,246,226,.35); }
@@ -2094,6 +2105,7 @@
     .wall-talk-shots.two { grid-template-columns: 1fr 1fr; }
     .wall-talk-shot { margin: 0; padding: 9px; border-radius: 10px; background: #fff; box-shadow: 0 6px 18px rgba(3,5,26,.12); }
     .wall-talk-shot img { display: block; width: 100%; max-height: 46vh; object-fit: contain; border-radius: 4px; background: #e9e3d2; }
+    .wall-talk-shot video { display: block; width: 100%; max-height: 46vh; border-radius: 4px; background: #000; }
     .wall-talk-cap { margin: 8px 2px 1px; color: rgba(43,47,91,.6); font-size: 11.5px; letter-spacing: .02em; }
     .wall-talk-body { padding: 20px 26px 26px; }
     .wall-talk-meta { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0 0 10px; font-size: 12.5px; color: rgba(43,47,91,.62); }
@@ -2389,12 +2401,26 @@
               </div>
             </div>
           </div>
+          <div class="wall-row">
+            <span class="wall-label">配一段视频（可以不传）</span>
+            <div class="wall-video-row">
+              <input class="wall-photo-input" id="wallVideo" type="file" accept="video/*" />
+              <label class="wall-photo-pick" for="wallVideo">从手机里选一段视频</label>
+              <div class="wall-video-preview" id="wallVideoPreview" hidden>
+                <video id="wallVideoPreviewEl" controls playsinline preload="metadata"></video>
+                <div class="wall-video-side">
+                  <button class="wall-preview-drop" id="wallVideoClear" type="button">换一段 / 去掉</button>
+                  <span class="wall-video-hint" id="wallVideoHint"></span>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="wall-actions">
             <button class="wall-submit" id="wallSubmit" type="submit">贴到墙上</button>
             <p class="wall-status" id="wallStatus"></p>
           </div>
         </form>
-        <p class="wall-note-safe">留言和照片都是公开的：贴上来之后所有访客都能看到，你的问题也会出现在这里等我的回答。自己传的照片会先在本地压缩（长边 1600px）再上传，只有图片、单张不超过 3 MB。</p>
+        <p class="wall-note-safe">留言和照片都是公开的：贴上来之后所有访客都能看到，你的问题也会出现在这里等我的回答。自己传的照片会先在本地压缩（长边 1600px）再上传；视频不压缩、按原文件直传，建议 30 秒以内、不超过 30 MB。</p>
       </section>
 
       <button class="wall-collapse" id="wallCollapse" type="button" aria-controls="wallNotes" title="快捷键 Esc" hidden>收起留言墙 <kbd>Esc</kbd></button>
@@ -4504,6 +4530,10 @@
       var MAX_SIDE = 1600;          /* 访客上传的照片，长边压到这个尺寸 */
       var PHOTO_QUALITY = 0.82;     /* JPEG 质量，和高中照片墙同一套参数 */
       var RAW_LIMIT = 12 * 1024 * 1024;  /* 原始文件上限：超过就不折腾了 */
+      var MAX_VIDEO = 30 * 1024 * 1024;  /* 视频不压缩、原文件直传，前端卡在 30 MB（存储桶那边放 50 MB） */
+      var VIDEO_MIME = { 'video/mp4': '.mp4', 'video/webm': '.webm', 'video/quicktime': '.mov' };
+      var SEL_FULL = 'select=id,name,message,photo_ref,photo_path,video_path,reply,replied_at,created_at';
+      var SEL_LEGACY = 'select=id,name,message,photo_ref,photo_path,reply,replied_at,created_at';
       var SHOW_LIMIT = 8;           /* 一次拉多少张便签（点一下「加载更多」就再来这么多） */
       var WALL_COVER = 8;           /* 封面只显示最新 8 张，剩下的点「加载更多」才铺开 */
 
@@ -4523,6 +4553,11 @@
       var previewImg = document.getElementById('wallPreviewImg');
       var previewHint = document.getElementById('wallPreviewHint');
       var photoClear = document.getElementById('wallPhotoClear');
+      var videoEl = document.getElementById('wallVideo');
+      var videoBox = document.getElementById('wallVideoPreview');
+      var videoPlayer = document.getElementById('wallVideoPreviewEl');
+      var videoHint = document.getElementById('wallVideoHint');
+      var videoClear = document.getElementById('wallVideoClear');
       var submitBtn = document.getElementById('wallSubmit');
       var statusEl = document.getElementById('wallStatus');
       var pickBtn = document.getElementById('wallPick');
@@ -4554,6 +4589,9 @@
       var sending = false;
       var pickedBlob = null;        /* 访客自己传的、压缩后的照片 */
       var pickedURL = '';           /* 预览用的 objectURL */
+      var pickedVideo = null;       /* 访客选的视频：{ file, type, ext, poster } */
+      var pickedVideoURL = '';      /* 视频预览用的 objectURL */
+      var wallVideoCol = true;      /* 后台有没有 video_path 列（没跑 V4 脚本时退化成 false，墙照常显示） */
       var shown = 0;
       var replied = 0;
       var mineRef = null;           /* 挑中的「我的一张照片」编号 1..91 */
@@ -4566,6 +4604,51 @@
 
       function photoURL(path) {
         return WALL_URL + '/storage/v1/object/public/' + WALL_BUCKET + '/' + path;
+      }
+
+      /* 视频 xxxx.mp4 的封面约定是同一个前缀的 xxxx.jpg（前端抓首帧后一起传上去） */
+      function posterURL(videoPath) {
+        return photoURL(String(videoPath).replace(/\.[^.]+$/, '.jpg'));
+      }
+
+      function videoBadge() {
+        var b = document.createElement('span');
+        b.className = 'wall-video-badge';
+        b.textContent = '\u25b6 视频';
+        return b;
+      }
+
+      /* 封面不存在时（没抓到帧的老视频）退化成静音 <video>，至少能看到首帧 */
+      function fallbackToVideo(box, path) {
+        if (box.getAttribute('data-fallback') === '1') return;
+        box.setAttribute('data-fallback', '1');
+        var img = box.querySelector('img');
+        if (img && img.parentNode === box) box.removeChild(img);
+        var v = document.createElement('video');
+        v.src = photoURL(path);
+        v.muted = true;
+        v.setAttribute('muted', '');
+        v.setAttribute('playsinline', '');
+        v.setAttribute('preload', 'metadata');
+        box.insertBefore(v, box.firstChild);
+      }
+
+      function talkVideo(src, poster, cap) {
+        var fig = document.createElement('figure');
+        fig.className = 'wall-talk-shot';
+        var v = document.createElement('video');
+        v.src = src;
+        if (poster) v.poster = poster;
+        v.controls = true;
+        v.setAttribute('controls', '');
+        v.setAttribute('playsinline', '');
+        v.setAttribute('preload', 'metadata');
+        var fc = document.createElement('figcaption');
+        fc.className = 'wall-talk-cap';
+        fc.textContent = cap;
+        fig.appendChild(v);
+        fig.appendChild(fc);
+        return fig;
       }
 
       function fmtTime(iso) {
@@ -4617,6 +4700,22 @@
             shots.appendChild(gi);
           }
           li.appendChild(shots);
+        }
+
+        var video = row.video_path || null;
+        if (video) {
+          var vbox = document.createElement('div');
+          vbox.className = 'wall-note-video';
+          var pimg = document.createElement('img');
+          pimg.src = posterURL(video);
+          pimg.alt = '留言里带的视频封面';
+          pimg.loading = 'lazy';
+          pimg.onerror = (function (box, path) {
+            return function () { fallbackToVideo(box, path); };
+          })(vbox, video);
+          vbox.appendChild(pimg);
+          vbox.appendChild(videoBadge());
+          li.appendChild(vbox);
         }
 
         var msg = document.createElement('p');
@@ -4690,11 +4789,14 @@
       function openTalk(row, node) {
         var mine = validRef(row.photo_ref);
         var guest = row.photo_path || null;
+        var video = row.video_path || null;
+        var shotCount = (mine ? 1 : 0) + (guest ? 1 : 0) + (video ? 1 : 0);
         talkShots.innerHTML = '';
-        talkShots.className = 'wall-talk-shots' + ((mine && guest) ? ' two' : '');
+        talkShots.className = 'wall-talk-shots' + (shotCount >= 2 ? ' two' : '');
         if (mine) talkShots.appendChild(talkShot(hsFull(mine), '我的一张照片 · 第 ' + mine + ' / ' + HS_FILES.length + ' 张'));
         if (guest) talkShots.appendChild(talkShot(photoURL(guest), '留言里带的照片'));
-        talkShots.hidden = !(mine || guest);
+        if (video) talkShots.appendChild(talkVideo(photoURL(video), posterURL(video), '留言里带的视频'));
+        talkShots.hidden = shotCount === 0;
 
         talkWho.textContent = row.name || '匿名';
         talkWhen.textContent = fmtTime(row.created_at);
@@ -4713,6 +4815,8 @@
 
       function closeTalk() {
         talk.hidden = true;
+        var playing = talkShots.querySelectorAll('video');
+        for (var i = 0; i < playing.length; i++) { try { playing[i].pause(); } catch (err) {} }
         if (picker.hidden) document.body.style.overflow = '';
         if (lastFocus && lastFocus.focus) { try { lastFocus.focus(); } catch (err) {} }
       }
@@ -4902,10 +5006,15 @@
         } else {
           wallLoading.hidden = false;
         }
-        fetch(WALL_URL + '/rest/v1/wall_notes?select=id,name,message,photo_ref,photo_path,reply,replied_at,created_at'
-              + '&hidden=eq.false&order=created_at.desc&limit=' + SHOW_LIMIT + '&offset=' + wallOffset, {
-          headers: { 'apikey': WALL_KEY, 'Authorization': 'Bearer ' + WALL_KEY }
-        }).then(function (res) {
+        var wallQ = '&hidden=eq.false&order=created_at.desc&limit=' + SHOW_LIMIT + '&offset=' + wallOffset;
+        var wallHdr = { 'apikey': WALL_KEY, 'Authorization': 'Bearer ' + WALL_KEY };
+        fetch(WALL_URL + '/rest/v1/wall_notes?' + SEL_FULL + wallQ, { headers: wallHdr })
+          .then(function (res) {
+            if (res.ok || res.status !== 400) return res;
+            /* 后台还没跑 V4 脚本（没有 video_path 这一列）：退回旧字段，留言墙照常显示 */
+            wallVideoCol = false;
+            return fetch(WALL_URL + '/rest/v1/wall_notes?' + SEL_LEGACY + wallQ, { headers: wallHdr });
+          }).then(function (res) {
           if (!res.ok) throw new Error('HTTP ' + res.status);
           return res.json();
         }).then(function (rows) {
@@ -5033,6 +5142,102 @@
       }
       if (photoClear) photoClear.addEventListener('click', function () { clearPhoto(); setStatus(''); });
 
+      /* ---------------- 访客传一段视频：不压缩，原文件直传 ---------------- */
+      function videoTypeOf(file) {
+        var t = String(file.type || '').toLowerCase();
+        if (VIDEO_MIME[t]) return t;
+        var n = String(file.name || '').toLowerCase();
+        if (/\.mp4$/.test(n)) return 'video/mp4';
+        if (/\.webm$/.test(n)) return 'video/webm';
+        if (/\.mov$/.test(n)) return 'video/quicktime';
+        return '';
+      }
+
+      function clearVideo() {
+        pickedVideo = null;
+        if (pickedVideoURL) { URL.revokeObjectURL(pickedVideoURL); pickedVideoURL = ''; }
+        if (videoEl) videoEl.value = '';
+        if (videoBox) videoBox.hidden = true;
+        if (videoPlayer) { videoPlayer.removeAttribute('src'); try { videoPlayer.load(); } catch (err) {} }
+        if (videoHint) videoHint.textContent = '';
+      }
+
+      /* 从视频里抽一帧当封面；抽不到返回 null，前台会退化成 <video> 显示首帧 */
+      function grabPoster(file) {
+        return new Promise(function (resolve) {
+          var url = URL.createObjectURL(file);
+          var v = document.createElement('video');
+          var done = false;
+          function finish(blob) {
+            if (done) return;
+            done = true;
+            URL.revokeObjectURL(url);
+            resolve(blob || null);
+          }
+          var timer = setTimeout(function () { finish(null); }, 6000);
+          function draw() {
+            try {
+              var w = v.videoWidth, h = v.videoHeight;
+              if (!w || !h) { clearTimeout(timer); finish(null); return; }
+              var scale = Math.min(1, 1280 / Math.max(w, h));
+              var cv = document.createElement('canvas');
+              cv.width = Math.max(1, Math.round(w * scale));
+              cv.height = Math.max(1, Math.round(h * scale));
+              cv.getContext('2d').drawImage(v, 0, 0, cv.width, cv.height);
+              if (!cv.toBlob) { clearTimeout(timer); finish(null); return; }
+              cv.toBlob(function (b) { clearTimeout(timer); finish(b); }, 'image/jpeg', 0.78);
+            } catch (err) { clearTimeout(timer); finish(null); }
+          }
+          v.muted = true;
+          v.setAttribute('playsinline', '');
+          v.setAttribute('preload', 'auto');
+          v.onloadeddata = function () {
+            try { v.currentTime = Math.min(0.2, (v.duration || 1) / 3); } catch (err) { draw(); }
+          };
+          v.onseeked = draw;
+          v.onerror = function () { clearTimeout(timer); finish(null); };
+          v.src = url;
+        });
+      }
+
+      if (videoEl) {
+        videoEl.addEventListener('change', function () {
+          var file = videoEl.files && videoEl.files[0];
+          if (!file) return;
+          if (!wallVideoCol) {
+            setStatus('后台还没开放视频上传（先跑一次 supabase-wall-video.sql）。', 'err');
+            clearVideo();
+            return;
+          }
+          var type = videoTypeOf(file);
+          if (!type) { setStatus('只能传 MP4 / MOV / WebM 的视频。', 'err'); clearVideo(); return; }
+          if (file.size > MAX_VIDEO) {
+            setStatus('这段视频有点大（' + (file.size / 1048576).toFixed(1) + ' MB，上限 '
+                      + Math.round(MAX_VIDEO / 1048576) + ' MB）。在相册里剪短一点再传吧。', 'err');
+            clearVideo();
+            return;
+          }
+          pickedVideo = { file: file, type: type, ext: VIDEO_MIME[type], poster: null };
+          if (pickedVideoURL) URL.revokeObjectURL(pickedVideoURL);
+          pickedVideoURL = URL.createObjectURL(file);
+          videoPlayer.src = pickedVideoURL;
+          videoBox.hidden = false;
+          videoHint.textContent = '正在读这段视频…';
+          setStatus('正在读这段视频…');
+          grabPoster(file).then(function (blob) {
+            if (!pickedVideo || pickedVideo.file !== file) return;
+            pickedVideo.poster = blob;
+            var secs = 0;
+            try { if (isFinite(videoPlayer.duration)) secs = videoPlayer.duration; } catch (err) { secs = 0; }
+            videoHint.textContent = (secs ? secs.toFixed(1) + ' 秒 · ' : '')
+              + (file.size / 1048576).toFixed(1) + ' MB'
+              + (blob ? ' · 封面已就绪' : ' · 封面没抓到，不影响上传');
+            setStatus('视频准备好了，上传可能要等一会儿，别关页面。', 'ok');
+          });
+        });
+      }
+      if (videoClear) videoClear.addEventListener('click', function () { clearVideo(); setStatus(''); });
+
       function uploadPhoto(blob) {
         var key = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8) + '.jpg';
         return fetch(WALL_URL + '/storage/v1/object/' + WALL_BUCKET + '/' + key, {
@@ -5057,6 +5262,50 @@
         });
       }
 
+      /* 带进度的上传：视频几十 MB，没进度条用户会以为卡死了 */
+      function uploadBlob(key, blob, contentType, onProgress) {
+        return new Promise(function (resolve, reject) {
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', WALL_URL + '/storage/v1/object/' + WALL_BUCKET + '/' + key, true);
+          xhr.setRequestHeader('apikey', WALL_KEY);
+          xhr.setRequestHeader('Authorization', 'Bearer ' + WALL_KEY);
+          xhr.setRequestHeader('Content-Type', contentType);
+          xhr.setRequestHeader('cache-control', 'max-age=31536000');
+          xhr.setRequestHeader('x-upsert', 'false');
+          if (onProgress && xhr.upload) {
+            xhr.upload.onprogress = function (e) {
+              if (e.lengthComputable) onProgress(Math.round(e.loaded / e.total * 100));
+            };
+          }
+          xhr.onload = function () {
+            if (xhr.status >= 200 && xhr.status < 300) { resolve(key); return; }
+            var detail = String(xhr.responseText || '');
+            if (/mime|not supported/i.test(detail)) {
+              reject(new Error('后台还没允许传视频（存储桶只放开了图片），让站长先跑一次 supabase-wall-video.sql'));
+            } else if (/exceeded|too large|maximum allowed/i.test(detail)) {
+              reject(new Error('这段视频超过了后台的单文件上限'));
+            } else {
+              reject(new Error('上传失败（HTTP ' + xhr.status + '）'));
+            }
+          };
+          xhr.onerror = function () { reject(new Error('网络中断，视频没传完')); };
+          xhr.send(blob);
+        });
+      }
+
+      function uploadVideo(v) {
+        var key = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8) + v.ext;
+        return uploadBlob(key, v.file, v.type, function (pct) {
+          setStatus('正在上传视频… ' + pct + '%（别关页面）');
+        }).then(function () {
+          if (!v.poster) return key;
+          /* 封面 xxxx.jpg 传失败不影响视频本身 */
+          var posterKey = key.replace(/\.[^.]+$/, '.jpg');
+          return uploadBlob(posterKey, v.poster, 'image/jpeg')
+            .then(function () { return key; }, function () { return key; });
+        });
+      }
+
       function restoreButton() {
         sending = false;
         submitBtn.disabled = false;
@@ -5076,14 +5325,23 @@
         sending = true;
         submitBtn.disabled = true;
         submitBtn.textContent = '正在贴…';
-        setStatus(pickedBlob ? '正在上传照片…' : '正在贴到墙上…');
+        setStatus(pickedBlob ? '正在上传照片…' : (pickedVideo ? '正在上传视频…' : '正在贴到墙上…'));
 
         var uploaded = null;
+        var uploadedVideo = null;
         var ref = mineRef;                       /* 先记下来：提交过程中访客可能又去改选 */
+        var videoPick = pickedVideo;             /* 同上：把当前选中的视频钉住 */
         var chain = pickedBlob ? uploadPhoto(pickedBlob) : Promise.resolve(null);
-        chain.then(function (path) {
-          uploaded = path;
-          if (path) setStatus('照片传好了，正在贴便签…');
+        chain = chain.then(function (photoPath) {
+          uploaded = photoPath;
+          if (!videoPick) return null;
+          if (photoPath) setStatus('照片传好了，接着传视频…');
+          return uploadVideo(videoPick);
+        });
+        chain.then(function (videoPath) {
+          uploadedVideo = videoPath || null;
+          if (uploadedVideo) setStatus('视频传好了，正在贴便签…');
+          else if (uploaded) setStatus('照片传好了，正在贴便签…');
           return fetch(WALL_URL + '/rest/v1/wall_notes', {
             method: 'POST',
             headers: {
@@ -5092,12 +5350,17 @@
               'Content-Type': 'application/json',
               'Prefer': 'return=minimal'
             },
-            body: JSON.stringify({
-              name: name || null,
-              message: message,
-              photo_ref: ref || null,
-              photo_path: path || null
-            })
+            body: JSON.stringify((function () {
+              var payload = {
+                name: name || null,
+                message: message,
+                photo_ref: ref || null,
+                photo_path: uploaded || null
+              };
+              /* 后台还没跑 V4 脚本时不能带 video_path，否则整条留言都会被拒（列不存在） */
+              if (wallVideoCol) payload.video_path = uploadedVideo || null;
+              return payload;
+            })())
           });
         }).then(function (res) {
           if (!res.ok) {
@@ -5115,6 +5378,7 @@
             message: message,
             photo_ref: ref,
             photo_path: uploaded,
+            video_path: uploadedVideo,
             reply: null,
             replied_at: null,
             created_at: new Date().toISOString()
@@ -5125,8 +5389,10 @@
           msgEl.value = '';
           nameEl.value = '';
           clearPhoto();
+          clearVideo();
           clearMine();
-          setStatus('贴好啦 —— 你想问的第 ' + (ref ? ref + ' 张照片' : '问题') + '已经上墙，我回答之后你点开便签就能看到。', 'ok');
+          setStatus((uploadedVideo ? '视频和留言都上墙了 —— ' : '贴好啦 —— ')
+                    + '我回答之后你点开便签就能看到。', 'ok');
         }).catch(function (err) {
           restoreButton();
           setStatus('没贴上（' + ((err && err.message) || '网络异常') + '）。你写的内容还在，再点一次「贴到墙上」就能重试。', 'err');
