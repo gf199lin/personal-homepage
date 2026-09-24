@@ -1077,7 +1077,8 @@
     }
 
     @media (max-width: 520px) {
-      nav { border-bottom: 0; }
+      /* 手机端同样保留底边：用 inset 阴影画，避免 border 挤压内容盒导致 0.5px 位移 */
+      nav { border-bottom: 0; box-shadow: inset 0 -1px 0 #1d2379; }
       .profile-card > .avatar-row { width: 100%; height: auto; aspect-ratio: 1 / 1; }
       .details-section, .chat-card { border-radius: 8px; }
     }
@@ -5785,6 +5786,116 @@
           setStatus('没贴上（' + ((err && err.message) || '网络异常') + '）。你写的内容还在，再点一次「贴到墙上」就能重试。', 'err');
         });
       });
+    })();
+  </script>
+<style>
+    /* 第43条：开场墨迹（纯 JS 生成，不挡操作、不改布局，约 2.2 秒后自己消失） */
+    #inkIntro { position: fixed; inset: 0; z-index: 9998; display: flex;
+      align-items: center; justify-content: center; background: #f4ead2;
+      pointer-events: none; }
+    #inkIntro svg { display: block; width: min(74vw, 560px); height: auto; overflow: visible; }
+    #inkIntro .ink-seal { position: absolute; left: 50%; bottom: 23%; transform: translateX(-50%);
+      font-family: Georgia, "Times New Roman", "Songti SC", serif; font-size: 12px;
+      letter-spacing: .34em; color: rgba(29,35,121,.62); white-space: nowrap; }
+    @media (max-width: 520px) {
+      #inkIntro svg { width: min(88vw, 420px); }
+      #inkIntro .ink-seal { font-size: 10px; letter-spacing: .26em; bottom: 25%; }
+    }
+  </style>
+  <script>
+    /* 第43条 INK_INTRO_V1：开场墨迹 —— 一笔一笔把名字描出来，再落款，然后自己消失。
+       纯前端、无依赖；不修改任何既有 DOM；系统开了「减少动态效果」或带 #锚点进来就跳过。 */
+    (function () {
+      try {
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        if (location.hash && location.hash.length > 1) return;
+        if (document.visibilityState === 'hidden') return;
+        if (!document.body) return;
+        var INK = '#1d2379';
+        var CHARS = ['林', '春', '烨'];
+        var FS = 132, W = 560, H = 250;
+        var NS = 'http://www.w3.org/2000/svg';
+        var wrap = document.createElement('div');
+        wrap.id = 'inkIntro';
+        wrap.setAttribute('aria-hidden', 'true');
+        var svg = document.createElementNS(NS, 'svg');
+        svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+        svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+        var step = FS * 1.06;
+        var x0 = W / 2 - step * (CHARS.length - 1) / 2;
+        var glyphs = [];
+        for (var i = 0; i < CHARS.length; i++) {
+          var tx = document.createElementNS(NS, 'text');
+          tx.textContent = CHARS[i];
+          tx.setAttribute('x', String(x0 + i * step));
+          tx.setAttribute('y', String(H / 2 + FS * 0.34));
+          tx.setAttribute('text-anchor', 'middle');
+          tx.setAttribute('font-family', 'Georgia, "Times New Roman", "Songti SC", serif');
+          tx.setAttribute('font-size', String(FS));
+          tx.setAttribute('fill', INK);
+          tx.setAttribute('fill-opacity', '0');
+          tx.setAttribute('stroke', INK);
+          tx.setAttribute('stroke-width', '1.6');
+          tx.setAttribute('stroke-linejoin', 'round');
+          tx.setAttribute('stroke-linecap', 'round');
+          tx.setAttribute('stroke-dasharray', '30000');
+          tx.setAttribute('stroke-dashoffset', '30000');
+          svg.appendChild(tx);
+          glyphs.push(tx);
+        }
+        var line = document.createElementNS(NS, 'line');
+        line.setAttribute('x1', String(W / 2 - 96));
+        line.setAttribute('x2', String(W / 2 + 96));
+        line.setAttribute('y1', String(H / 2 + 96));
+        line.setAttribute('y2', String(H / 2 + 96));
+        line.setAttribute('stroke', INK);
+        line.setAttribute('stroke-width', '2');
+        line.setAttribute('stroke-linecap', 'round');
+        line.setAttribute('stroke-dasharray', '192');
+        line.setAttribute('stroke-dashoffset', '192');
+        line.setAttribute('opacity', '0.5');
+        svg.appendChild(line);
+        var seal = document.createElement('div');
+        seal.className = 'ink-seal';
+        seal.textContent = 'LIN CHUNYE · PERSONAL PAGE';
+        seal.style.opacity = '0';
+        wrap.appendChild(svg);
+        wrap.appendChild(seal);
+        document.body.appendChild(wrap);
+
+        function drop() { if (wrap.parentNode) wrap.parentNode.removeChild(wrap); }
+        var canAnim = !!(window.Element && Element.prototype && Element.prototype.animate);
+        var last = 140 + (CHARS.length - 1) * 250 + 640;   /* 最后一笔收笔 ≈ 1530ms */
+        var fadeAt = last + 700;                            /* 开始淡出 ≈ 2230ms */
+        if (canAnim) {
+          glyphs.forEach(function (tx, i) {
+            var d = 140 + i * 250;
+            tx.animate([{ strokeDashoffset: 30000 }, { strokeDashoffset: 0 }],
+              { duration: 640, delay: d, easing: 'ease-in-out', fill: 'forwards' });
+            tx.animate([{ fillOpacity: 0 }, { fillOpacity: 1 }],
+              { duration: 420, delay: d + 430, easing: 'ease-out', fill: 'forwards' });
+          });
+          line.animate([{ strokeDashoffset: 192 }, { strokeDashoffset: 0 }],
+            { duration: 420, delay: last + 60, easing: 'ease-out', fill: 'forwards' });
+          seal.animate([{ opacity: 0 }, { opacity: 1 }],
+            { duration: 420, delay: last + 220, easing: 'ease-out', fill: 'forwards' });
+          wrap.animate([{ opacity: 1 }, { opacity: 0 }],
+            { duration: 520, delay: fadeAt, easing: 'ease-in-out', fill: 'forwards' });
+          setTimeout(drop, fadeAt + 620);
+        } else {
+          /* 极老浏览器（没有 Web Animations）：直接把字填出来，1.2 秒后淡出 */
+          glyphs.forEach(function (tx) {
+            tx.setAttribute('fill-opacity', '1');
+            tx.setAttribute('stroke-dashoffset', '0');
+          });
+          line.setAttribute('stroke-dashoffset', '0');
+          seal.style.opacity = '1';
+          wrap.style.transition = 'opacity .5s ease';
+          setTimeout(function () { wrap.style.opacity = '0'; }, 1200);
+          setTimeout(drop, 2000);
+        }
+        setTimeout(drop, fadeAt + 1200);   /* 兜底：不管怎样 3.4 秒内一定清掉 */
+      } catch (e) {}
     })();
   </script>
 </body>
