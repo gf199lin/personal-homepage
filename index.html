@@ -774,7 +774,7 @@
       padding: clamp(34px, 5vw, 72px);
       border: 1px solid rgba(29,35,121,.12);
       border-radius: 12px;
-      background: #faeed1;
+      background: #f4ead2;
       color: #1d2379;
       box-shadow: 0 28px 70px rgba(29,35,121,.12);
       isolation: isolate;
@@ -953,7 +953,7 @@
 
     .chat-card {
       border: 1px solid rgba(29,35,121,.14);
-      background: #faeed1;
+      background: #f4ead2;
     }
 
     /* 第29条：板块「米白 → 深宝蓝」交替（先米白再蓝色） */
@@ -1002,7 +1002,7 @@
       background: rgba(253,246,226,.7);
     }
     .chat-card .suggestion:hover { color: #fdf6e2; background: #1d2379; }
-    .chat-card .messages { background: #faeed1; }
+    .chat-card .messages { background: #f4ead2; }
     .bubble { border: 1px solid rgba(29,35,121,.13); border-radius: 4px 14px 14px 14px; color: #161c66; background: #fdf6e2; box-shadow: 0 8px 22px rgba(29,35,121,.07); }
     .user .bubble { border-radius: 14px 4px 14px 14px; color: #fdf6e2; background: #1d2379; }
     .chat-card .composer { border-top: 1px solid rgba(29,35,121,.12); background: #f6eed8; }
@@ -1234,7 +1234,7 @@
 
     .shell { z-index: 2; }
     nav { background: rgba(247,238,215,.84); backdrop-filter: blur(8px); }
-    .profile-card { background: rgba(250,238,209,.94); backdrop-filter: blur(8px); }
+    .profile-card { background: #f4ead2; backdrop-filter: blur(8px); }
     /* 第29条修正：把 .details-section 从上面这组米白规则里拆出，避免它覆盖深蓝板块背景 */
     .details-section {
       border: 1px solid rgba(253,246,226,.22);
@@ -1864,9 +1864,9 @@
     .hs-section.is-light { border: 1px solid rgba(29,35,121,.14); background: #faeed1; box-shadow: 0 28px 70px rgba(29,35,121,.14); }
     .hs-section.is-dark { border: 1px solid rgba(253,246,226,.22); background: linear-gradient(145deg, #1d2379 0%, #1b2176 52%, #151b6b 100%); box-shadow: 0 28px 70px rgba(21,27,107,.22); }
     .hs-section.is-plain { padding: clamp(20px, 2.6vw, 30px) 0 0; border: 0; background: transparent; box-shadow: none; }
-    /* 深圳板块：米白底。必须跟主页的米白是同一套（V2 全站米白：
-       --white #fdf6e2 → --sky #faeed1 → 页面底 #f4ead2），不要再写早期那套旧米白。 */
-    .hs-section.is-cream { border: 1px solid rgba(29,35,121,.16); background: linear-gradient(160deg, var(--white) 0%, var(--sky) 52%, #f4ead2 100%); box-shadow: 0 28px 70px rgba(29,35,121,.11); }
+    /* 深圳板块：米白底。2026-09-28 用户裁定：与页面底色**同一米白**（body #f4ead2），
+       不再用「米白C → 米白A(--sky) → 页面底」渐变，也不再单独用米白C。 */
+    .hs-section.is-cream { border: 1px solid rgba(29,35,121,.16); background: #f4ead2; box-shadow: 0 28px 70px rgba(29,35,121,.11); }
     .hs-section.is-cream .hs-title { color: var(--ink); }
 
     /* 深圳板块的排布（2026-09-20 用户要求「好看一点、下面别留白」）：
