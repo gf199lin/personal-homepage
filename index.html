@@ -37,35 +37,6 @@
     button, input { font: inherit; }
     button { cursor: pointer; }
 
-    .waves {
-      position: fixed;
-      inset: 0;
-      overflow: hidden;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .waves .w {
-      position: absolute;
-      font-size: 36px;
-      opacity: 0.46;
-      filter: saturate(1);
-      animation: bob 6s ease-in-out infinite;
-    }
-
-    .waves .w1 { top: 6%;  left: 4%; }
-    .waves .w2 { top: 14%; right: 6%; font-size: 28px; animation-delay: 1.2s; }
-    .waves .w3 { top: 46%; left: 2%;  font-size: 26px; animation-delay: 0.6s; }
-    .waves .w4 { top: 70%; right: 4%; font-size: 32px; animation-delay: 1.8s; }
-    .waves .w5 { bottom: 5%; left: 40%; font-size: 30px; animation-delay: 0.9s; }
-    .waves .w6 { top: 82%; left: 15%; font-size: 24px; animation-delay: 2.3s; }
-    .waves .w7 { top: 8%;  left: 52%; font-size: 22px; animation-delay: 0.3s; }
-
-    @keyframes bob {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50%      { transform: translateY(-7px) rotate(4deg); }
-    }
-
     .shell {
       position: relative;
       z-index: 1;
@@ -921,7 +892,6 @@
       background: #f4ead2;
     }
 
-    .waves { display: none; }
     nav { border: 1.5px solid #1d2379; border-radius: 12px; padding: 0 20px; }
     .brand { color: #1d2379; font-family: Georgia, "Times New Roman", "Songti SC", serif; font-size: 17px; }
     .brand-mark { border-radius: 4px; color: #fdf6e2; background: #1d2379; box-shadow: none; }
@@ -2219,7 +2189,6 @@
     <div class="dog-tile"><img src="assets/dog-wallpaper/samoyed-blue-line-02.png" alt="" /></div>
     <div class="dog-tile"><img src="assets/dog-wallpaper/samoyed-blue-line-05.png" alt="" /></div>
   </div>
-  <div class="waves" aria-hidden="true"><span class="w w1">🌊</span><span class="w w2">🌊</span><span class="w w3">🌊</span><span class="w w4">🌊</span><span class="w w5">🌊</span><span class="w w6">🌊</span><span class="w w7">🌊</span></div>
   <div class="shell">
     <nav aria-label="主导航">
       <div class="brand"><span class="brand-mark">林</span> 林春烨的主页</div>
