@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "workspace": {
+    "name": "个人主页",
+    "createdAt": 1788428565361,
+    "preset": "starter"
+  },
+  "authorizedRoots": [
+    "C:\\Users\\BayMax\\Desktop\\个人主页"
+  ],
+  "reload": null
+}

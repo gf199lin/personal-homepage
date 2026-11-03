@@ -1,0 +1,15 @@
+{
+  "name": "gf-digital-twin",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "GF 个人主页数字分身：知识库 + DeepSeek 代理 + 前端接入",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "test": "node test/run.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

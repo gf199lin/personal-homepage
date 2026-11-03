@@ -1,0 +1,22 @@
+# ---- 私密与凭据（绝不入库）----
+.env
+.env.*
+!.env.example
+uploads/
+secrets/
+
+# ---- DeepWorks / 工具临时目录 ----
+.deepworks/
+.opencode/node_modules/
+node_modules/
+*.log
+
+# ---- 大体积历史备份与生成物（保留在本地，不入库）----
+homepage/
+outputs/
+output/
+rollback-*.html
+keep-*.html
+*.zip
+*.pdf
+报告落在, anchor
