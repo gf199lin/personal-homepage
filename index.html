@@ -2793,29 +2793,36 @@
 
     async function fetchTwinReply(question) {
       if (location.protocol === 'file:') return null;
-      const controller = new AbortController();
-      // 云函数冷启动 + 长上下文推理可能要 5~15 秒，留足余量（函数端超时 30 秒）
-      const timer = window.setTimeout(() => controller.abort(), 25000);
-      try {
-        const res = await fetch(TWIN_API, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            question,
-            history: chatHistory.slice(-MAX_HISTORY_TURNS * 2)
-          }),
-          signal: controller.signal
-        });
-        if (!res.ok) return null;
-        const data = await res.json();
-        return data && typeof data.reply === 'string' && data.reply.trim()
-          ? data.reply.trim()
-          : null;
-      } catch (err) {
-        return null;
-      } finally {
-        window.clearTimeout(timer);
+      const body = JSON.stringify({
+        question,
+        history: chatHistory.slice(-MAX_HISTORY_TURNS * 2)
+      });
+      // 失败重试一次：冷启动偶发超时不该直接掉到本地预设
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        const controller = new AbortController();
+        // 云函数冷启动 + 长上下文推理可能要 5~15 秒，留足余量（函数端超时 30 秒）
+        const timer = window.setTimeout(() => controller.abort(), 25000);
+        try {
+          const res = await fetch(TWIN_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body,
+            signal: controller.signal
+          });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          const data = await res.json();
+          const reply = data && typeof data.reply === 'string' ? data.reply.trim() : '';
+          if (reply) return reply;
+          throw new Error('empty reply');
+        } catch (err) {
+          // 控制台留痕：用来区分「模型回答」和「本地预设兜底」
+          console.warn('[twin] 第 ' + (attempt + 1) + ' 次请求失败：', err && err.message);
+        } finally {
+          window.clearTimeout(timer);
+        }
+        if (attempt === 0) await new Promise(r => setTimeout(r, 400));
       }
+      return null;
     }
 
     async function ask(question) {
@@ -2834,6 +2841,8 @@
       const local = answer(clean);
       const text = remote || local.text;
       const bubble = addMessage('', 'bot');
+      // 标记这句是模型答的还是本地预设，排查时直接在元素上看
+      bubble.dataset.twinSource = remote ? 'live' : 'local';
 
       typeInto(bubble, text, () => {
         const img = localImageFor(text) || (remote ? null : local.img);
