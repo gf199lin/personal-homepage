@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "node server.js",
     "start": "node server.js",
-    "test": "node test/run.mjs"
+    "test": "node test/run.mjs",
+    "build:cloud": "node scripts/build-cloud-function.mjs"
   },
   "engines": {
     "node": ">=18"

@@ -14,7 +14,7 @@ export function hasApiKey() {
   return Boolean(env('DEEPSEEK_API_KEY'));
 }
 
-export async function chatWithDeepSeek(messages, { signal } = {}) {
+export async function chatWithDeepSeek(messages, { signal, temperature, maxTokens } = {}) {
   const apiKey = env('DEEPSEEK_API_KEY');
   if (!apiKey) throw new TwinError('未配置 DEEPSEEK_API_KEY', { status: 503, code: 'no_key' });
 
@@ -24,8 +24,8 @@ export async function chatWithDeepSeek(messages, { signal } = {}) {
   const payload = {
     model,
     messages,
-    temperature: envFloat('DEEPSEEK_TEMPERATURE', 0.8),
-    max_tokens: envInt('DEEPSEEK_MAX_TOKENS', 600),
+    temperature: temperature ?? envFloat('DEEPSEEK_TEMPERATURE', 0.8),
+    max_tokens: maxTokens ?? envInt('DEEPSEEK_MAX_TOKENS', 600),
     stream: false,
   };
 

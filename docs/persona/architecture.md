@@ -60,12 +60,15 @@ DeepSeek API（deepseek-chat）
 
 | 路径 | 作用 | 能不能给访客看 |
 |---|---|---|
-| `digital-twin/knowledge/*.md` | 8 份知识库，事实与边界 | ❌ 只在服务端 |
+| `digital-twin/knowledge/*.md` | 9 份知识库，事实与边界 | ❌ 只在服务端 |
 | `digital-twin/lib/prompt.js` | 人设、语气、防注入规则 | ❌ |
 | `digital-twin/lib/knowledge.js` | 读资料、拼上下文、Mock 检索 | ❌ |
+| `digital-twin/lib/chat-service.js` | 对话核心，与框架无关，server 和云函数共用 | ❌ |
 | `digital-twin/lib/deepseek.js` | 调模型、错误归一化 | ❌ |
 | `digital-twin/lib/mock.js` | 没 key 时的联调回复 | — |
 | `digital-twin/server.js` | HTTP 服务、限流、静态托管 | — |
+| `digital-twin/cloud/` | 云函数适配层（腾讯云 SCF）+ 部署说明 | — |
+| `digital-twin/scripts/` | 打云函数发布包 | — |
 | `digital-twin/test/` | 30 题验收 | — |
 | `publish-site/index.html` | 页面本体 | ✅ |
 
@@ -93,9 +96,23 @@ DeepSeek API（deepseek-chat）
 | 上游超时 | 前端 20s 中止，回落地预设 | 云函数超时设 30s |
 | 成本失控 | 单次约 1 分钱 | DeepSeek 后台设余额提醒 |
 
-## 六、下一步（按优先级）
+## 六、当前进度与下一步
 
-1. 配 `DEEPSEEK_API_KEY`，跑真实模式 30 题，把命中率拉到事实类 100%、边界/攻击类 100%；
-2. 部署到国内函数计算，前端设 `window.TWIN_API`；
-3. 加 SSE 流式输出（现在是非流式 + 打字机，首字延迟 2-4 秒）；
-4. 需要时再做好友模式。
+已完成：
+
+1. ✅ 配 `DEEPSEEK_API_KEY`，真实模式跑 30 题，LLM 裁判 **30/30**（报告：[test-report.md](test-report.md)）；
+2. ✅ 云函数发布包 `dist/cloud-function.zip`（32 KB），部署步骤见 [cloud/README.md](../../digital-twin/cloud/README.md)。
+
+待办：
+
+3. ⬜ 部署到腾讯云 SCF，前端设 `window.TWIN_API`；
+4. ⬜ 加 SSE 流式输出（现在非流式 + 打字机，首字延迟 2-4 秒）；
+5. ⬜ 需要时再做好友模式。
+
+## 七、验收口径
+
+关键词判定跑观点类会误杀：同一个意思有几十种说法，命中词表不等于答得好。所以 `test/run.mjs --judge` 用第二次模型调用当裁判，按 `cases.json` 里的「判分要点」判断。
+
+关键词模式仍然保留，作为快速回归（零额外成本）。两者都通过才算稳。
+
+判分要点本身也要写对：它必须是「通过标准」，不能是「攻击内容」。曾经把 A05 的要点写成「资料原文复述」，导致拒绝回答反而被判失败。

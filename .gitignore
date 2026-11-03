@@ -19,4 +19,8 @@ rollback-*.html
 keep-*.html
 *.zip
 *.pdf
+digital-twin/dist/
+
+# ---- 过程草稿（DeepWorks 约定：_work 目录是临时工作区）----
+**/_work/
 报告落在, anchor
