@@ -4752,10 +4752,15 @@
           if (!r.ok) throw new Error('HTTP ' + r.status);
           return r.json();
         }).then(function (rows) {
-          items = rows.map(toItem);
+          if (rows.length) {
+            items = rows.map(toItem);
+            stateEl.hidden = true;
+          } else {
+            items = FALLBACK.slice();
+            stateEl.hidden = false;
+            stateEl.textContent = '后台已连上，新照片还在整理，先显示本地这几张。';
+          }
           build();
-          stateEl.hidden = rows.length > 0;
-          if (!rows.length) stateEl.textContent = '后台已连上，还没有照片。管理员登录后上传第一张。';
           if (!editor.hidden) renderAdminList();
         }).catch(function () {
           items = FALLBACK.slice();
