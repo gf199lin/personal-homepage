@@ -10,7 +10,7 @@ const KB_DIR = resolve(ROOT, 'knowledge');
  *  - policy  : 风格与边界，不逐字展示，作为规则提炼给模型。
  * 05/06 属于 policy，其余属于 content。
  */
-const POLICY_FILES = new Set(['05_personal_style.md', '06_boundaries.md']);
+const POLICY_FILES = new Set(['05_personal_style.md', '06_boundaries.md', '10_voice_samples.md']);
 
 let cache = null;
 

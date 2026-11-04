@@ -105,7 +105,7 @@ DeepSeek API（deepseek-chat）
 
 待办：
 
-3. ⬜ 部署到腾讯云 SCF，前端设 `window.TWIN_API`；
+3. ✅ 已部署到腾讯云 SCF，前端 `window.TWIN_API` 指向函数 URL；
 4. ⬜ 加 SSE 流式输出（现在非流式 + 打字机，首字延迟 2-4 秒）；
 5. ⬜ 需要时再做好友模式。
 

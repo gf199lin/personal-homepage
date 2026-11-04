@@ -1,6 +1,6 @@
 # GF 数字分身
 
-林春烨个人主页上的对话分身。不是关键词问答，是真的接 DeepSeek：把 9 份资料全量注入 system prompt，按人设和边界说话。
+林春烨个人主页上的对话分身。不是关键词问答，是真的接 DeepSeek：把 10 份资料全量注入 system prompt，按人设和边界说话。
 
 前端在 `publish-site/index.html`，后端在这里。
 
@@ -13,7 +13,7 @@
 | 30 题验收 | ✅ 30/30（LLM 裁判，见 `../docs/persona/test-report.md`） |
 | 前端接入 | ✅ 已改成调 `/api/chat`，失败自动回落本地预设 |
 | 云函数发布包 | ✅ `dist/cloud-function.zip`（32 KB） |
-| 云端部署 | ⬜ 待部署，步骤见 [cloud/README.md](cloud/README.md) |
+| 云端部署 | ✅ 已部署（腾讯云 SCF · `gf-twin-chat` · 广州），线上实际模型 `deepseek-flash` |
 
 ## 快速开始
 
@@ -59,7 +59,7 @@ ALLOWED_ORIGINS=http://localhost:8787
 
 ## 知识库怎么维护
 
-`knowledge/` 下 9 份 Markdown，启动时读入内存缓存在进程里：
+`knowledge/` 下 10 份 Markdown，启动时读入内存缓存在进程里：
 
 | 文件 | 内容 |
 |---|---|
@@ -93,7 +93,7 @@ digital-twin/
 │  ├─ deepseek.js         调模型、错误归一化
 │  ├─ env.js              读 .env
 │  └─ mock.js             无 Key 时的兜底回复
-├─ knowledge/             9 份资料
+├─ knowledge/             10 份资料
 ├─ test/
 │  ├─ cases.json          30 条用例（F 事实 / O 观点 / B 边界 / A 攻击）
 │  └─ run.mjs             跑分脚本

@@ -17,6 +17,8 @@
 - Daniel Caesar — *NEVER ENOUGH*
 - Daniel Caesar — *Son of Spergy*
 
+主页上常挂的是 Daniel Caesar 的《Let Me Go》，最近听得比较多。
+
 ## 电影与剧集
 
 喜欢或提及的作品：
