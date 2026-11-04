@@ -2207,8 +2207,8 @@
     .uni-meta { margin: 3px 0 0; font-size: 12px; color: var(--muted); }
     .uni-state { margin: 18px 0 0; color: var(--muted); font-size: 13px; }
     .uni-state[hidden] { display: none; }
-    .uni-admin-btn { margin-top: 2px; padding: 5px 10px; border: 1px solid rgba(29,35,121,.2); border-radius: 999px; background: transparent; color: var(--muted); font: inherit; font-size: 11.5px; cursor: pointer; }
-    .uni-admin-btn:hover { border-color: var(--ocean); color: var(--ocean); }
+    .uni-admin-btn { margin-top: 6px; padding: 7px 16px; border: 0; border-radius: 999px; background: var(--ink); color: #fff; font: inherit; font-size: 12px; cursor: pointer; box-shadow: 0 4px 12px rgba(29,35,121,.18); }
+    .uni-admin-btn:hover { background: var(--ocean); color: #fff; }
     .uni-admin { position: fixed; inset: 0; z-index: 80; display: flex; align-items: center; justify-content: center; padding: 18px; background: rgba(14,18,55,.55); backdrop-filter: blur(4px); }
     .uni-admin[hidden] { display: none; }
     .uni-admin-panel { width: min(720px, 100%); max-height: 88vh; overflow: auto; padding: 22px; border-radius: 18px; background: #fffaf0; box-shadow: 0 24px 70px rgba(10,14,40,.35); }
@@ -2415,7 +2415,7 @@
           <div class="sz-school">
             <p class="sz-school-name">🏃🏻‍➡️天津大学香港理工大学深圳未来技术学院</p>
             <p class="hs-total"><b id="uniCount">7</b> 张照片</p>
-            <button class="uni-admin-btn" id="uniAdminBtn" type="button" hidden>管理照片</button>
+            <button class="uni-admin-btn" id="uniAdminBtn" type="button">上传照片</button>
           </div>
         </header>
         <div class="uni-wall" id="szWall"></div>
@@ -5083,7 +5083,6 @@
       logoutBtn.addEventListener('click', logout);
       importBtn.addEventListener('click', importLocal);
 
-      if (/[?&]admin=1\b/.test(location.search) || token) adminBtn.hidden = false;
 
       load();
     })();
