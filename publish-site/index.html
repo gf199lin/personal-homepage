@@ -2193,6 +2193,50 @@
     @media (prefers-reduced-motion: reduce) {
       .wall-submit, .wall-photo-pick, .wall-note { transition: none; }
     }
+
+    /* ===== 大学照片墙（Supabase 动态） ===== */
+    .uni-wall { columns: 3; column-gap: 14px; }
+    .uni-card { break-inside: avoid; -webkit-column-break-inside: avoid; margin: 0 0 14px; }
+    .uni-open { display: block; width: 100%; padding: 0; border: 1px solid rgba(29,35,121,.14); border-radius: 12px; background: #f7eed9; overflow: hidden; cursor: zoom-in; box-shadow: 0 6px 18px rgba(29,35,121,.08); transition: box-shadow .3s, transform .3s; }
+    .uni-open:hover, .uni-open:focus-visible { box-shadow: 0 14px 30px rgba(29,35,121,.16); transform: translateY(-2px); outline: none; }
+    .uni-open img { display: block; width: 100%; height: auto; transition: transform .55s cubic-bezier(.2,.7,.2,1); }
+    .uni-open:hover img, .uni-open:focus-visible img { transform: scale(1.03); }
+    .uni-open.is-crop img { aspect-ratio: 3 / 4; object-fit: cover; object-position: top center; }
+    .uni-cap { margin-top: 8px; }
+    .uni-mood { margin: 0; font-size: 13.5px; line-height: 1.65; color: var(--ink); }
+    .uni-meta { margin: 3px 0 0; font-size: 12px; color: var(--muted); }
+    .uni-state { margin: 18px 0 0; color: var(--muted); font-size: 13px; }
+    .uni-state[hidden] { display: none; }
+    .uni-admin-btn { margin-top: 2px; padding: 5px 10px; border: 1px solid rgba(29,35,121,.2); border-radius: 999px; background: transparent; color: var(--muted); font: inherit; font-size: 11.5px; cursor: pointer; }
+    .uni-admin-btn:hover { border-color: var(--ocean); color: var(--ocean); }
+    .uni-admin { position: fixed; inset: 0; z-index: 80; display: flex; align-items: center; justify-content: center; padding: 18px; background: rgba(14,18,55,.55); backdrop-filter: blur(4px); }
+    .uni-admin[hidden] { display: none; }
+    .uni-admin-panel { width: min(720px, 100%); max-height: 88vh; overflow: auto; padding: 22px; border-radius: 18px; background: #fffaf0; box-shadow: 0 24px 70px rgba(10,14,40,.35); }
+    .uni-admin-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+    .uni-admin-head h3 { margin: 0; font-size: 17px; color: var(--ink); }
+    .uni-admin-head button { border: 0; background: transparent; font-size: 24px; line-height: 1; color: var(--muted); cursor: pointer; }
+    .uni-admin-tip { margin: 0 0 14px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .uni-field { display: block; margin-bottom: 12px; color: var(--ink); font-size: 13px; }
+    .uni-field span { display: block; margin-bottom: 5px; color: var(--muted); }
+    .uni-field input, .uni-field textarea { width: 100%; padding: 9px 11px; border: 1px solid rgba(29,35,121,.2); border-radius: 9px; background: #fff; color: var(--ink); font: inherit; font-size: 13px; }
+    .uni-field textarea { resize: vertical; }
+    .uni-primary { padding: 9px 18px; border: 0; border-radius: 999px; background: var(--ink); color: #fff; font: inherit; font-size: 13px; cursor: pointer; }
+    .uni-primary:disabled { opacity: .55; cursor: wait; }
+    .uni-status { min-height: 18px; margin: 12px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.5; }
+    .uni-status.is-err { color: #b23b3b; }
+    .uni-status.is-ok { color: #2f7a52; }
+    .uni-list-head { display: flex; align-items: center; justify-content: space-between; margin: 18px 0 10px; padding-top: 16px; border-top: 1px solid rgba(29,35,121,.12); color: var(--ink); font-size: 13px; font-weight: 700; }
+    .uni-list-head button { border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 12px; cursor: pointer; text-decoration: underline; }
+    .uni-list-head span { display: inline-flex; align-items: center; gap: 10px; }
+    .uni-row { display: grid; grid-template-columns: 76px 1fr; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(29,35,121,.08); }
+    .uni-row > img { width: 76px; height: 76px; object-fit: cover; border-radius: 8px; }
+    .uni-row input, .uni-row textarea { width: 100%; margin-bottom: 5px; padding: 6px 8px; border: 1px solid rgba(29,35,121,.16); border-radius: 7px; background: #fff; color: var(--ink); font: inherit; font-size: 12.5px; }
+    .uni-row textarea { resize: vertical; }
+    .uni-row-actions { grid-column: 1 / -1; display: flex; gap: 8px; justify-content: flex-end; }
+    .uni-row-actions button { padding: 5px 11px; border: 1px solid rgba(29,35,121,.18); border-radius: 999px; background: #fff; color: var(--ink); font: inherit; font-size: 12px; cursor: pointer; }
+    .uni-row-actions button[data-act="del"] { color: #b23b3b; border-color: rgba(178,59,59,.3); }
+    @media (max-width: 860px) { .uni-wall { columns: 2; } }
+    @media (max-width: 520px) { .uni-wall { columns: 1; } .uni-admin-panel { padding: 16px; } }
   </style>
 </head>
 <body>
@@ -2370,11 +2414,50 @@
           </div>
           <div class="sz-school">
             <p class="sz-school-name">🏃🏻‍➡️天津大学香港理工大学深圳未来技术学院</p>
-            <p class="hs-total"><b>7</b> 张照片</p>
+            <p class="hs-total"><b id="uniCount">7</b> 张照片</p>
+            <button class="uni-admin-btn" id="uniAdminBtn" type="button" hidden>管理照片</button>
           </div>
         </header>
-        <div class="sz-wall" id="szWall"></div>
+        <div class="uni-wall" id="szWall"></div>
+        <p class="uni-state" id="uniState" hidden></p>
         <p class="hs-hint" id="szHint">点任意一张放大 · 左右方向键连续翻看 · Esc 关大图</p>
+
+        <div class="uni-admin" id="uniAdmin" hidden aria-hidden="true">
+          <div class="uni-admin-panel" role="dialog" aria-modal="true" aria-labelledby="uniAdminTitle">
+            <div class="uni-admin-head">
+              <h3 id="uniAdminTitle">管理大学照片</h3>
+              <button id="uniAdminClose" type="button" aria-label="关闭">&times;</button>
+            </div>
+
+            <div id="uniLogin">
+              <p class="uni-admin-tip">只有管理员能上传和修改。用 Supabase 里创建的那个邮箱登录。</p>
+              <label class="uni-field"><span>邮箱</span><input id="uniEmail" type="email" autocomplete="username" /></label>
+              <label class="uni-field"><span>密码</span><input id="uniPassword" type="password" autocomplete="current-password" /></label>
+              <button class="uni-primary" id="uniLoginBtn" type="button">登录</button>
+            </div>
+
+            <div id="uniEditor" hidden>
+              <form id="uniForm">
+                <label class="uni-field"><span>选一张照片</span><input id="uniFile" type="file" accept="image/jpeg,image/png,image/webp" /></label>
+                <label class="uni-field"><span>当时的心情</span><textarea id="uniMood" maxlength="120" rows="2" placeholder="比如：第一次在深圳湾骑车，风大得说不出话"></textarea></label>
+                <label class="uni-field"><span>地点 / 一句话（可选）</span><input id="uniCaption" maxlength="40" /></label>
+                <label class="uni-field"><span>拍摄日期（可选）</span><input id="uniDate" type="date" /></label>
+                <button class="uni-primary" id="uniUploadBtn" type="submit">上传</button>
+              </form>
+
+              <div class="uni-list-head">
+                <span>已有照片</span>
+                <span>
+                  <button id="uniImportBtn" type="button" hidden>导入本地 7 张</button>
+                  <button id="uniLogout" type="button">退出登录</button>
+                </span>
+              </div>
+              <div id="uniList"></div>
+            </div>
+
+            <p class="uni-status" id="uniStatus" role="status"></p>
+          </div>
+        </div>
       </section>
       <section class="wall-section" id="guestwall" aria-labelledby="wallTitle">
         <header class="wall-head">
@@ -4442,6 +4525,566 @@
   </script>
 
   <script>
+    /* ================= 大学照片墙 · Supabase =================
+       公开只读；管理员用 Supabase Auth 的邮箱 + 密码登录后，可以上传、
+       改心情、删除。没登录只渲染数据库里的照片；请求失败时回落到原来的
+       7 张本地照片，页面不会空白。 */
+    (function () {
+      window.__UNI_WALL__ = true;
+
+      var UNI_URL = 'https://egtmvobebmzapshkbkoq.supabase.co';
+      var UNI_KEY = 'sb_publishable_T6iHzsd0ZCxXM1Vf6V9V-g_8yOD2pKd';
+      var UNI_BUCKET = 'university-photos';
+      var UNI_TABLE = 'university_photos';
+      var SZ_BASE = 'assets/shenzhen/';
+      var TOKEN_KEY = 'uni_admin_token';
+      var EMAIL_KEY = 'uni_admin_email';
+      var MAX_SIDE = 1600;
+      var QUALITY = 0.85;
+
+      var FALLBACK = [
+        { id: '', path: '', src: SZ_BASE + 'sz-01.jpg', full: SZ_BASE + 'full/sz-01.jpg', mood: '我上课', caption: '', date: '' },
+        { id: '', path: '', src: SZ_BASE + 'sz-02.jpg', full: SZ_BASE + 'full/sz-02.jpg', mood: '巧了你也穿了白色入镜', caption: '', date: '' },
+        { id: '', path: '', src: SZ_BASE + 'sz-03.jpg', full: SZ_BASE + 'full/sz-03.jpg', mood: '和侨中量子纠缠十年', caption: '', date: '' },
+        { id: '', path: '', src: SZ_BASE + 'sz-04.jpg', full: SZ_BASE + 'full/sz-04.jpg', mood: '要坏掉了？', caption: '', date: '' },
+        { id: '', path: '', src: SZ_BASE + 'sz-05.jpg', full: SZ_BASE + 'full/sz-05.jpg', mood: '都快累翔了，周六早上徒步8km', caption: '', date: '' },
+        { id: '', path: '', src: SZ_BASE + 'sz-06.jpg', full: SZ_BASE + 'full/sz-06.jpg', mood: '神秘大学城', caption: '', date: '' },
+        { id: '', path: '', src: SZ_BASE + 'sz-07.jpg', full: SZ_BASE + 'full/sz-07.jpg', mood: '不再依赖豆包算长大吗', caption: '', date: '', crop: true }
+      ];
+
+      var wall = document.getElementById('szWall');
+      if (!wall) return;
+
+      var countEl = document.getElementById('uniCount');
+      var stateEl = document.getElementById('uniState');
+      var adminBtn = document.getElementById('uniAdminBtn');
+      var admin = document.getElementById('uniAdmin');
+      var adminClose = document.getElementById('uniAdminClose');
+      var loginBox = document.getElementById('uniLogin');
+      var editor = document.getElementById('uniEditor');
+      var emailEl = document.getElementById('uniEmail');
+      var passwordEl = document.getElementById('uniPassword');
+      var loginBtn = document.getElementById('uniLoginBtn');
+      var form = document.getElementById('uniForm');
+      var fileEl = document.getElementById('uniFile');
+      var moodEl = document.getElementById('uniMood');
+      var captionEl = document.getElementById('uniCaption');
+      var dateEl = document.getElementById('uniDate');
+      var uploadBtn = document.getElementById('uniUploadBtn');
+      var listEl = document.getElementById('uniList');
+      var logoutBtn = document.getElementById('uniLogout');
+      var importBtn = document.getElementById('uniImportBtn');
+      var statusEl = document.getElementById('uniStatus');
+
+      var lb = document.getElementById('szLb');
+      var lbImg = document.getElementById('szLbImg');
+      var lbCap = document.getElementById('szLbCap');
+      var lbCount = document.getElementById('szLbCount');
+      var lbPrev = document.getElementById('szLbPrev');
+      var lbNext = document.getElementById('szLbNext');
+      var lbClose = document.getElementById('szLbClose');
+
+      var items = [];
+      var idx = 0;
+      var lastFocus = null;
+      var token = readStore(TOKEN_KEY);
+      var adminEmail = readStore(EMAIL_KEY);
+
+      function readStore(k) { try { return sessionStorage.getItem(k) || ''; } catch (e) { return ''; } }
+      function writeStore(k, v) { try { sessionStorage.setItem(k, v); } catch (e) {} }
+      function clearStore(k) { try { sessionStorage.removeItem(k); } catch (e) {} }
+      function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+      function headers(extra) {
+        var h = { apikey: UNI_KEY, Authorization: 'Bearer ' + (token || UNI_KEY) };
+        if (extra) {
+          for (var k in extra) {
+            if (Object.prototype.hasOwnProperty.call(extra, k)) h[k] = extra[k];
+          }
+        }
+        return h;
+      }
+
+      function toItem(row) {
+        var url = UNI_URL + '/storage/v1/object/public/' + UNI_BUCKET + '/' + row.storage_path;
+        return {
+          id: row.id,
+          path: row.storage_path,
+          src: url,
+          full: url,
+          mood: row.mood || '',
+          caption: row.caption || '',
+          date: row.taken_on || ''
+        };
+      }
+
+      function setStatus(text, kind) {
+        statusEl.textContent = text || '';
+        statusEl.className = 'uni-status' + (kind ? ' is-' + kind : '');
+      }
+
+      function build() {
+        wall.textContent = '';
+        if (countEl) countEl.textContent = items.length;
+        var frag = document.createDocumentFragment();
+        for (var n = 0; n < items.length; n++) {
+          (function (it, i) {
+            var fig = document.createElement('figure');
+            fig.className = 'uni-card';
+
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'uni-open' + (it.crop ? ' is-crop' : '');
+            b.setAttribute('aria-label', '放大查看第 ' + (i + 1) + ' 张照片');
+
+            var img = document.createElement('img');
+            img.src = it.src;
+            img.alt = it.mood || ('大学照片 ' + (i + 1));
+            img.loading = 'lazy';
+            img.decoding = 'async';
+            b.appendChild(img);
+            b.addEventListener('click', function () { openLb(i, b); });
+            fig.appendChild(b);
+
+            if (it.mood || it.caption || it.date) {
+              var cap = document.createElement('figcaption');
+              cap.className = 'uni-cap';
+              if (it.mood) {
+                var p = document.createElement('p');
+                p.className = 'uni-mood';
+                p.textContent = it.mood;
+                cap.appendChild(p);
+              }
+              var meta = [it.date, it.caption].filter(Boolean).join(' · ');
+              if (meta) {
+                var m = document.createElement('p');
+                m.className = 'uni-meta';
+                m.textContent = meta;
+                cap.appendChild(m);
+              }
+              fig.appendChild(cap);
+            }
+            frag.appendChild(fig);
+          })(items[n], n);
+        }
+        wall.appendChild(frag);
+      }
+
+      /* ---- 大图连看 ---- */
+      function openLb(n, from) {
+        idx = n;
+        lastFocus = from || document.activeElement;
+        showLb();
+        lb.classList.add('is-open');
+        lb.setAttribute('aria-hidden', 'false');
+        lbClose.focus();
+      }
+
+      function showLb() {
+        var it = items[idx];
+        if (!it) return;
+        lbImg.src = it.full || it.src;
+        lbImg.alt = it.mood || ('大学照片 ' + (idx + 1));
+        lbCap.textContent = [it.mood, it.caption, it.date].filter(Boolean).join(' · ');
+        lbCount.textContent = pad(idx + 1) + ' / ' + pad(items.length);
+        lbPrev.disabled = idx === 0;
+        lbNext.disabled = idx === items.length - 1;
+      }
+
+      function step(d) {
+        var n = idx + d;
+        if (n < 0 || n >= items.length) return;
+        idx = n;
+        showLb();
+      }
+
+      function closeLb() {
+        lb.classList.remove('is-open');
+        lb.setAttribute('aria-hidden', 'true');
+        if (lastFocus && lastFocus.focus) lastFocus.focus();
+      }
+
+      lbPrev.addEventListener('click', function () { step(-1); });
+      lbNext.addEventListener('click', function () { step(1); });
+      lbClose.addEventListener('click', closeLb);
+      lb.addEventListener('click', function (e) {
+        var t = e.target;
+        if (t === lbPrev || t === lbNext || t === lbCount) return;
+        if (lbClose.contains(t)) return;
+        if (t === lb || t.parentNode === lb) closeLb();
+      });
+
+      var tsX = 0, tsY = 0, tsT = 0;
+      lb.addEventListener('touchstart', function (e) {
+        if (!e.touches || e.touches.length !== 1) { tsT = 0; return; }
+        tsX = e.touches[0].clientX;
+        tsY = e.touches[0].clientY;
+        tsT = Date.now();
+      }, { passive: true });
+      lb.addEventListener('touchend', function (e) {
+        var t = e.changedTouches && e.changedTouches[0];
+        var started = tsT;
+        tsT = 0;
+        if (!t || !started || Date.now() - started > 900) return;
+        var dx = t.clientX - tsX, dy = t.clientY - tsY;
+        if (Math.abs(dx) < 46 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
+        step(dx < 0 ? 1 : -1);
+      }, { passive: true });
+
+      document.addEventListener('keydown', function (e) {
+        if (!lb.classList.contains('is-open')) return;
+        if (e.key === 'Escape' || e.key === 'Esc') {
+          closeLb(); e.preventDefault(); e.stopPropagation();
+        } else if (e.key === 'ArrowLeft') {
+          step(-1); e.preventDefault(); e.stopPropagation();
+        } else if (e.key === 'ArrowRight') {
+          step(1); e.preventDefault(); e.stopPropagation();
+        }
+      }, true);
+
+      /* ---- 数据 ---- */
+      function load() {
+        return fetch(
+          UNI_URL + '/rest/v1/' + UNI_TABLE +
+          '?select=id,storage_path,mood,caption,taken_on,sort_order&order=sort_order.asc,created_at.asc',
+          { headers: headers() }
+        ).then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        }).then(function (rows) {
+          items = rows.map(toItem);
+          build();
+          stateEl.hidden = rows.length > 0;
+          if (!rows.length) stateEl.textContent = '后台已连上，还没有照片。管理员登录后上传第一张。';
+          if (!editor.hidden) renderAdminList();
+        }).catch(function () {
+          items = FALLBACK.slice();
+          build();
+          stateEl.hidden = false;
+          stateEl.textContent = '后台暂时没连上，先显示本地这 7 张。';
+          if (!editor.hidden) renderAdminList();
+        });
+      }
+
+      /* ---- 登录 ---- */
+      function showEditor(logged) {
+        loginBox.hidden = logged;
+        editor.hidden = !logged;
+        if (logged) renderAdminList();
+      }
+
+      function verifyToken() {
+        if (!token) { showEditor(false); return Promise.resolve(false); }
+        return fetch(UNI_URL + '/auth/v1/user', {
+          headers: { apikey: UNI_KEY, Authorization: 'Bearer ' + token }
+        }).then(function (r) {
+          if (!r.ok) throw new Error('expired');
+          return r.json();
+        }).then(function (u) {
+          adminEmail = (u && u.email) || adminEmail;
+          writeStore(EMAIL_KEY, adminEmail);
+          showEditor(true);
+          return true;
+        }).catch(function () {
+          token = '';
+          clearStore(TOKEN_KEY);
+          showEditor(false);
+          return false;
+        });
+      }
+
+      function login() {
+        var email = emailEl.value.trim();
+        var pwd = passwordEl.value;
+        if (!email || !pwd) { setStatus('邮箱和密码都要填。', 'err'); return; }
+        loginBtn.disabled = true;
+        setStatus('登录中…');
+        fetch(UNI_URL + '/auth/v1/token?grant_type=password', {
+          method: 'POST',
+          headers: { apikey: UNI_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, password: pwd })
+        }).then(function (r) {
+          return r.json().then(function (j) { return { ok: r.ok, body: j }; });
+        }).then(function (x) {
+          if (!x.ok) throw new Error(x.body.error_description || x.body.msg || '登录失败');
+          token = x.body.access_token;
+          adminEmail = (x.body.user && x.body.user.email) || email;
+          writeStore(TOKEN_KEY, token);
+          writeStore(EMAIL_KEY, adminEmail);
+          passwordEl.value = '';
+          setStatus('已登录：' + adminEmail, 'ok');
+          showEditor(true);
+          return load();
+        }).catch(function (err) {
+          setStatus(err.message || '登录失败', 'err');
+        }).then(function () {
+          loginBtn.disabled = false;
+        });
+      }
+
+      function logout() {
+        token = '';
+        adminEmail = '';
+        clearStore(TOKEN_KEY);
+        clearStore(EMAIL_KEY);
+        showEditor(false);
+        setStatus('已退出登录。');
+      }
+
+      /* ---- 上传 ---- */
+      function compress(file) {
+        return new Promise(function (resolve, reject) {
+          if (!/^image\//.test(file.type)) { reject(new Error('请选图片文件。')); return; }
+          var url = URL.createObjectURL(file);
+          var img = new Image();
+          img.onload = function () {
+            var w = img.naturalWidth, h = img.naturalHeight;
+            var scale = Math.min(1, MAX_SIDE / Math.max(w, h));
+            var cw = Math.round(w * scale), ch = Math.round(h * scale);
+            var c = document.createElement('canvas');
+            c.width = cw;
+            c.height = ch;
+            c.getContext('2d').drawImage(img, 0, 0, cw, ch);
+            URL.revokeObjectURL(url);
+            c.toBlob(function (blob) {
+              if (blob) resolve(blob);
+              else reject(new Error('图片压缩失败。'));
+            }, 'image/jpeg', QUALITY);
+          };
+          img.onerror = function () {
+            URL.revokeObjectURL(url);
+            reject(new Error('这张图读不出来。'));
+          };
+          img.src = url;
+        });
+      }
+
+      function upload(file, mood, caption, date) {
+        var path = Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.jpg';
+        return compress(file).then(function (blob) {
+          return fetch(UNI_URL + '/storage/v1/object/' + UNI_BUCKET + '/' + path, {
+            method: 'POST',
+            headers: headers({ 'Content-Type': 'image/jpeg' }),
+            body: blob
+          }).then(function (r) {
+            if (!r.ok) {
+              return r.text().then(function (t) { throw new Error('上传失败：' + t); });
+            }
+          });
+        }).then(function () {
+          return fetch(UNI_URL + '/rest/v1/' + UNI_TABLE, {
+            method: 'POST',
+            headers: headers({ 'Content-Type': 'application/json', Prefer: 'return=representation' }),
+            body: JSON.stringify({
+              storage_path: path,
+              mood: mood,
+              caption: caption,
+              taken_on: date || null
+            })
+          }).then(function (r) {
+            if (!r.ok) {
+              return r.text().then(function (t) { throw new Error('写入失败：' + t); });
+            }
+            return r.json();
+          });
+        });
+      }
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var file = fileEl.files && fileEl.files[0];
+        var mood = moodEl.value.trim();
+        if (!file) { setStatus('先选一张照片。', 'err'); return; }
+        if (!mood) { setStatus('写一句当时的心情。', 'err'); return; }
+        uploadBtn.disabled = true;
+        setStatus('正在压缩并上传…');
+        upload(file, mood, captionEl.value.trim(), dateEl.value).then(function () {
+          setStatus('上传好了。', 'ok');
+          form.reset();
+          return load();
+        }).catch(function (err) {
+          setStatus(err.message || '上传失败。', 'err');
+        }).then(function () {
+          uploadBtn.disabled = false;
+        });
+      });
+
+      /* ---- 管理列表 ---- */
+      function renderAdminList() {
+        listEl.textContent = '';
+        var rows = items.filter(function (it) { return !!it.id; });
+        if (importBtn) importBtn.hidden = rows.length > 0;
+        if (!rows.length) {
+          var p = document.createElement('p');
+          p.className = 'uni-admin-tip';
+          p.textContent = items.length ? '当前显示的是本地兜底照片，不能编辑。' : '还没有照片，上面传一张。';
+          listEl.appendChild(p);
+          return;
+        }
+
+        rows.forEach(function (it) {
+          var row = document.createElement('div');
+          row.className = 'uni-row';
+
+          var img = document.createElement('img');
+          img.src = it.src;
+          img.alt = '';
+          row.appendChild(img);
+
+          var fields = document.createElement('div');
+
+          var mood = document.createElement('textarea');
+          mood.rows = 2;
+          mood.maxLength = 120;
+          mood.value = it.mood;
+          mood.placeholder = '当时的心情';
+          fields.appendChild(mood);
+
+          var cap = document.createElement('input');
+          cap.type = 'text';
+          cap.maxLength = 40;
+          cap.value = it.caption;
+          cap.placeholder = '地点 / 一句话（可选）';
+          fields.appendChild(cap);
+
+          var date = document.createElement('input');
+          date.type = 'date';
+          date.value = it.date || '';
+          fields.appendChild(date);
+
+          row.appendChild(fields);
+
+          var actions = document.createElement('div');
+          actions.className = 'uni-row-actions';
+
+          var save = document.createElement('button');
+          save.type = 'button';
+          save.setAttribute('data-act', 'save');
+          save.textContent = '保存';
+          save.addEventListener('click', function () {
+            saveRow(it, mood.value.trim(), cap.value.trim(), date.value, save);
+          });
+          actions.appendChild(save);
+
+          var del = document.createElement('button');
+          del.type = 'button';
+          del.setAttribute('data-act', 'del');
+          del.textContent = '删除';
+          del.addEventListener('click', function () { deleteRow(it, del); });
+          actions.appendChild(del);
+
+          row.appendChild(actions);
+          listEl.appendChild(row);
+        });
+      }
+
+      function saveRow(item, mood, caption, date, btn) {
+        btn.disabled = true;
+        setStatus('保存中…');
+        fetch(UNI_URL + '/rest/v1/' + UNI_TABLE + '?id=eq.' + encodeURIComponent(item.id), {
+          method: 'PATCH',
+          headers: headers({ 'Content-Type': 'application/json', Prefer: 'return=minimal' }),
+          body: JSON.stringify({ mood: mood, caption: caption, taken_on: date || null })
+        }).then(function (r) {
+          if (!r.ok) {
+            return r.text().then(function (t) { throw new Error('保存失败：' + t); });
+          }
+          setStatus('已保存。', 'ok');
+          return load();
+        }).catch(function (err) {
+          setStatus(err.message || '保存失败。', 'err');
+        }).then(function () {
+          btn.disabled = false;
+        });
+      }
+
+      function deleteRow(item, btn) {
+        if (!window.confirm('删除这张照片？')) return;
+        btn.disabled = true;
+        setStatus('删除中…');
+        fetch(UNI_URL + '/rest/v1/' + UNI_TABLE + '?id=eq.' + encodeURIComponent(item.id), {
+          method: 'DELETE',
+          headers: headers({ Prefer: 'return=minimal' })
+        }).then(function (r) {
+          if (!r.ok) {
+            return r.text().then(function (t) { throw new Error('删除失败：' + t); });
+          }
+          return fetch(UNI_URL + '/storage/v1/object/' + UNI_BUCKET + '/' + item.path, {
+            method: 'DELETE',
+            headers: headers()
+          });
+        }).then(function () {
+          setStatus('已删除。', 'ok');
+          return load();
+        }).catch(function (err) {
+          setStatus(err.message || '删除失败。', 'err');
+        }).then(function () {
+          btn.disabled = false;
+        });
+      }
+
+      function importLocal() {
+        if (!window.confirm('把本地这 7 张照片导入后台？导入后就能在列表里改心情。')) return;
+        importBtn.disabled = true;
+        var list = FALLBACK.slice();
+        var chain = Promise.resolve();
+        list.forEach(function (it, i) {
+          chain = chain.then(function () {
+            setStatus('正在导入 ' + (i + 1) + ' / ' + list.length + '…');
+            return fetch(it.src).then(function (r) {
+              if (!r.ok) throw new Error('读不到本地照片：' + it.src);
+              return r.blob();
+            }).then(function (blob) {
+              return upload(blob, it.mood, it.caption, it.date);
+            });
+          });
+        });
+        chain.then(function () {
+          setStatus('7 张都导入了。', 'ok');
+          return load();
+        }).catch(function (err) {
+          setStatus(err.message || '导入失败。', 'err');
+        }).then(function () {
+          importBtn.disabled = false;
+        });
+      }
+
+      /* ---- 入口 ---- */
+      function openAdmin() {
+        admin.hidden = false;
+        admin.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('ke-locked');
+        setStatus('');
+        if (token) verifyToken();
+        else showEditor(false);
+      }
+
+      function closeAdmin() {
+        admin.hidden = true;
+        admin.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('ke-locked');
+        setStatus('');
+      }
+
+      adminBtn.addEventListener('click', openAdmin);
+      adminClose.addEventListener('click', closeAdmin);
+      admin.addEventListener('click', function (e) {
+        if (e.target === admin) closeAdmin();
+      });
+      loginBtn.addEventListener('click', login);
+      passwordEl.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); login(); }
+      });
+      logoutBtn.addEventListener('click', logout);
+      importBtn.addEventListener('click', importLocal);
+
+      if (/[?&]admin=1\b/.test(location.search) || token) adminBtn.hidden = false;
+
+      load();
+    })();
+  </script>
+
+  <script>
     /* ================= 深圳板块：我在深圳很想你 =================
        7 张照片直接铺满，没有封面这一层（2026-09-20 用户改版要求）：
        一进页面就是七张，点任意一张进大图连看，Esc 关大图。
@@ -4454,6 +5097,7 @@
              crop = 1 表示长图只露上面一截（点开放大仍是完整原图）
     ============================================================ */
     (function () {
+      if (window.__UNI_WALL__) return;
       var SZ_BASE = 'assets/shenzhen/';
       var SZ_PHOTOS = [
       {
