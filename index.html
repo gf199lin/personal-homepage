@@ -656,7 +656,7 @@
     .gf-facet {
       display: flex;
       gap: 12px;
-      padding: 9px 0;
+      padding: 11px 0;
       border-bottom: 1px solid rgba(29,35,121,.12);
     }
 
@@ -687,8 +687,8 @@
     }
 
     .gf-quote {
-      margin: 14px 0 0;
-      padding: 14px 0 0;
+      margin: 20px 0 0;
+      padding: 18px 0 0;
       border-top: 1px solid rgba(29,35,121,.18);
     }
 
@@ -710,7 +710,7 @@
     }
 
     .gf-sign {
-      margin: 12px 0 0;
+      margin: 18px 0 0;
       color: rgba(29,35,121,.4);
       font-size: 9px;
       font-weight: 700;
@@ -2215,458 +2215,20 @@
     @media (max-width: 860px) { .uni-wall { columns: 2; } }
     @media (max-width: 520px) { .uni-wall { columns: 1; } .uni-admin-panel { padding: 16px; } }
   </style>
-  <style id="gf-moments-styles">
-    /* V5：朋友圈 + 数字分身聊天 */
-    .chat-card {
-      grid-template-columns: minmax(290px, 35%) minmax(0, 65%);
-      grid-template-rows: auto 1fr;
-      grid-template-areas:
-        "profile side"
-        "intro side";
-      min-height: 860px;
-    }
-
-    .gf-profile { grid-area: profile; min-width: 0; }
-
-    .gf-cover {
-      position: relative;
-      height: 196px;
-      overflow: hidden;
-      background:
-        radial-gradient(120% 100% at 82% 8%, rgba(255,255,255,.26), rgba(255,255,255,0) 52%),
-        linear-gradient(152deg, #161c66 0%, #27307f 46%, #8296bb 100%);
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-    }
-
-    .gf-cover::before {
-      content: "";
-      position: absolute;
-      left: -12%;
-      right: -12%;
-      top: 61%;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(253,246,226,.42), transparent);
-      transform: rotate(-7deg);
-    }
-
-    .gf-cover::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, rgba(13,18,64,0) 40%, rgba(13,18,64,.58) 100%);
-    }
-
-    .gf-cover.has-cover::before { display: none; }
-
-    .gf-cover-kicker,
-    .gf-cover-caption {
-      position: absolute;
-      z-index: 1;
-      margin: 0;
-      color: rgba(253,246,226,.88);
-    }
-
-    .gf-cover-kicker {
-      top: 18px;
-      left: 22px;
-      font-size: 9.5px;
-      font-weight: 800;
-      letter-spacing: .24em;
-      text-transform: uppercase;
-    }
-
-    .gf-cover-caption {
-      left: 22px;
-      bottom: 16px;
-      font-size: 10.5px;
-      letter-spacing: .06em;
-      color: rgba(253,246,226,.72);
-    }
-
-    .gf-cover-caption #gfCoverName { color: #fdf6e2; letter-spacing: .04em; }
-    .gf-cover-dot { margin: 0 6px; opacity: .6; }
-
-    .chat-card .gf-panel { display: flex; flex-direction: column; }
-    .chat-card .bot-avatar { border-color: rgba(29,35,121,.22); box-shadow: 0 6px 14px rgba(29,35,121,.12); }
-    .chat-card .gf-sign { margin-top: auto; padding-top: 12px; }
-
-    .twin-side {
-      grid-area: side;
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-      min-height: 0;
-    }
-
-    /* 朋友圈 */
-    .moments {
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-      background: #f6eed8;
+  <style id="gf-cover-styles">
+    .chat-card .gf-panel { position: relative; }
+    .chat-card .gf-cover {
+      height: 236px;
+      margin: -26px -30px 22px;
+      background: #dfe6ee url("assets/gf-cover.jpg") center 58% / cover no-repeat;
       border-bottom: 1px solid rgba(29,35,121,.14);
+      box-shadow: inset 0 -30px 34px -30px rgba(246,238,216,.95);
     }
-
-    .moments-head {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 16px 26px 12px;
-      border-bottom: 1px solid rgba(29,35,121,.1);
+    @media (max-width: 820px) {
+      .chat-card .gf-cover { height: 260px; margin: -22px -24px 20px; }
     }
-
-    .moments-kicker {
-      margin: 0;
-      color: rgba(29,35,121,.46);
-      font-size: 9px;
-      font-weight: 800;
-      letter-spacing: .22em;
-      text-transform: uppercase;
-    }
-
-    .moments-title {
-      margin: 3px 0 0;
-      color: #1d2379;
-      font-family: Georgia, "Times New Roman", "Songti SC", serif;
-      font-size: 20px;
-      font-weight: 500;
-      line-height: 1.2;
-      letter-spacing: .01em;
-    }
-
-    .moments-count {
-      margin: 0 0 1px;
-      color: rgba(21,27,107,.5);
-      font-size: 10.5px;
-      letter-spacing: .04em;
-      white-space: nowrap;
-    }
-
-    .moments-count b {
-      color: #1d2379;
-      font-family: Georgia, serif;
-      font-size: 15px;
-      font-weight: 500;
-    }
-
-    .moments-feed {
-      height: 340px;
-      -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 22px), transparent);
-      mask-image: linear-gradient(180deg, #000 calc(100% - 22px), transparent);
-      padding: 0 26px 16px;
-      overflow-y: auto;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(29,35,121,.22) transparent;
-    }
-
-    .moments-feed::-webkit-scrollbar { width: 6px; }
-    .moments-feed::-webkit-scrollbar-thumb { background: rgba(29,35,121,.2); border-radius: 999px; }
-
-    .moments-note {
-      margin: 10px 0 4px;
-      padding: 7px 10px;
-      border: 1px dashed rgba(29,35,121,.2);
-      color: rgba(21,27,107,.52);
-      font-size: 10px;
-      line-height: 1.6;
-    }
-
-    .moments-empty {
-      margin: 18px 0;
-      color: rgba(21,27,107,.5);
-      font-size: 12px;
-    }
-
-    .moment-group-title {
-      position: sticky;
-      top: 0;
-      z-index: 2;
-      margin: 0;
-      padding: 9px 0 7px;
-      border-bottom: 1px solid rgba(29,35,121,.1);
-      color: rgba(29,35,121,.48);
-      background: #f6eed8;
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: .14em;
-    }
-
-    .moment {
-      position: relative;
-      padding: 12px 0 14px;
-      border-bottom: 1px solid rgba(29,35,121,.09);
-    }
-
-    .moment:last-child { border-bottom: 0; }
-
-    .moment.is-active {
-      background: rgba(29,35,121,.045);
-      box-shadow: inset 2px 0 0 rgba(29,35,121,.55);
-      padding-left: 10px;
-      padding-right: 10px;
-      margin-left: -10px;
-      margin-right: -10px;
-    }
-
-    .moment-top {
-      display: flex;
-      align-items: baseline;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .moment-cat {
-      padding: 2px 7px;
-      border: 1px solid rgba(29,35,121,.2);
-      border-radius: 999px;
-      color: #1d2379;
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: .08em;
-    }
-
-    .moment-time {
-      color: rgba(21,27,107,.4);
-      font-size: 10px;
-      letter-spacing: .04em;
-    }
-
-    .moment-demo-tag {
-      color: rgba(21,27,107,.4);
-      font-size: 9px;
-      letter-spacing: .12em;
-    }
-
-    .moment-text {
-      margin: 7px 0 0;
-      color: #161c66;
-      font-size: 13px;
-      line-height: 1.85;
-      white-space: pre-line;
-    }
-
-    .moment-tags {
-      margin: 7px 0 0;
-      color: rgba(29,35,121,.5);
-      font-size: 10px;
-      letter-spacing: .02em;
-    }
-
-    .moment-media {
-      display: grid;
-      grid-template-columns: repeat(var(--moment-cols, 3), minmax(0, 1fr));
-      align-items: start;
-      gap: 5px;
-      margin-top: 9px;
-    }
-
-    .moment-img-btn {
-      display: block;
-      width: 100%;
-      padding: 0;
-      border: 0;
-      background: #e7dcc4;
-      cursor: zoom-in;
-      overflow: hidden;
-    }
-
-    .moment-img-btn:focus-visible { outline: 2px solid #1d2379; outline-offset: 2px; }
-
-    .moment-img {
-      display: block;
-      width: 100%;
-      height: auto;
-    }
-
-    .moment-media.single .moment-img-btn { width: auto; max-width: 100%; background: transparent; }
-    .moment-media.single .moment-img { width: auto; max-width: 100%; max-height: 280px; }
-
-    .moment-img-ph {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      aspect-ratio: 4 / 3;
-      border: 1px dashed rgba(29,35,121,.22);
-      color: rgba(21,27,107,.42);
-      background: rgba(255,255,255,.28);
-      font-size: 9.5px;
-      letter-spacing: .06em;
-    }
-
-    .moment-foot {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-top: 9px;
-      color: rgba(21,27,107,.42);
-      font-size: 10px;
-    }
-
-    .moment-chat {
-      margin-left: auto;
-      padding: 2px 0;
-      border: 0;
-      border-bottom: 1px solid rgba(29,35,121,.28);
-      color: #1d2379;
-      background: transparent;
-      font: inherit;
-      font-size: 10.5px;
-      font-weight: 700;
-      letter-spacing: .02em;
-      cursor: pointer;
-    }
-
-    .moment-chat:hover { border-color: #1d2379; }
-
-    /* 聊天 */
-    .chat-panel {
-      display: flex;
-      flex-direction: column;
-      flex: 1 1 auto;
-      min-height: 0;
-      background: #f4ead2;
-    }
-
-    .chat-bar {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 13px 24px;
-      border-bottom: 1px solid rgba(29,35,121,.12);
-      background: #f6eed8;
-    }
-
-    .chat-bar-title {
-      margin: 0;
-      color: #1d2379;
-      font-family: Georgia, "Times New Roman", "Songti SC", serif;
-      font-size: 15px;
-      font-weight: 500;
-      white-space: nowrap;
-    }
-
-    .chat-bar-title b { font-weight: 500; }
-
-    .chat-bar-hint {
-      margin: 0 0 0 auto;
-      overflow: hidden;
-      color: rgba(21,27,107,.46);
-      font-size: 10.5px;
-      letter-spacing: .02em;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-
-    .chat-card .chat-panel .messages {
-      grid-area: auto;
-      flex: 1 1 auto;
-      height: auto;
-      min-height: 280px;
-      max-height: 420px;
-      padding: 24px 26px;
-      background: #f4ead2;
-    }
-
-    .chat-card .chat-panel .composer {
-      grid-area: auto;
-      padding: 14px 22px 20px;
-      border-top: 1px solid rgba(29,35,121,.12);
-      background: #f6eed8;
-    }
-
-    .chat-card .chat-panel .bubble { max-width: min(86%, 520px); }
-
-    .moment-context {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 9px 22px;
-      border-top: 1px solid rgba(29,35,121,.12);
-      background: #efe4cc;
-      color: rgba(21,27,107,.6);
-      font-size: 10.5px;
-    }
-
-    .moment-context[hidden] { display: none; }
-
-    .moment-context-label {
-      flex: 0 0 auto;
-      color: rgba(29,35,121,.48);
-      letter-spacing: .08em;
-    }
-
-    .moment-context-text {
-      flex: 1 1 auto;
-      min-width: 0;
-      overflow: hidden;
-      color: #1d2379;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .moment-context-clear {
-      flex: 0 0 auto;
-      width: 20px;
-      height: 20px;
-      padding: 0;
-      border: 0;
-      border-radius: 50%;
-      color: #1d2379;
-      background: rgba(29,35,121,.08);
-      font-size: 13px;
-      line-height: 18px;
-      cursor: pointer;
-    }
-
-    .moment-context-clear:hover { background: rgba(29,35,121,.16); }
-
-    @media (max-width: 1100px) {
-      .gf-cover { height: 176px; }
-      .moments-feed { height: 300px; }
-      .chat-card .chat-panel .messages { padding: 20px 22px; }
-    }
-
-    @media (max-width: 960px) {
-      .chat-card {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto auto;
-        grid-template-areas:
-          "profile"
-          "intro"
-          "side";
-        min-height: 0;
-      }
-
-      .gf-cover { height: 190px; }
-      .chat-card .gf-panel { padding: 22px 24px 26px; }
-      .chat-card .gf-sign { margin-top: 18px; padding-top: 0; }
-      .moments-head { padding: 16px 24px 12px; }
-      .moments-feed { height: 360px; padding: 0 24px 16px; }
-      .chat-bar { padding: 13px 22px; }
-      .chat-bar-hint { display: none; }
-      .chat-card .chat-head .online { display: flex; }
-      .chat-card .chat-panel .messages { flex: 0 0 360px; height: 360px; max-height: none; padding: 22px 24px; }
-      .chat-card .chat-panel .composer { padding: 14px 20px 20px; }
-      .moment-context { padding: 9px 20px; }
-    }
-
     @media (max-width: 430px) {
-      .gf-cover { height: 168px; }
-      .gf-cover-kicker { top: 15px; left: 18px; }
-      .gf-cover-caption { left: 18px; bottom: 14px; }
-      .chat-card .gf-panel { padding: 18px 18px 22px; }
-      .moments-head { padding: 14px 18px 10px; }
-      .moments-feed { height: 340px; padding: 0 18px 14px; }
-      .chat-bar { padding: 12px 18px; }
-      .chat-bar-title { font-size: 14px; }
-      .chat-card .chat-panel .messages { flex: 0 0 340px; height: 340px; max-height: none; padding: 18px; }
-      .chat-card .chat-panel .composer { padding: 12px 14px 16px; }
-      .moment-context { padding: 8px 16px; }
-      .moment-text { font-size: 12.5px; }
+      .chat-card .gf-cover { height: 210px; margin: -18px -18px 18px; }
     }
   </style>
 </head>
@@ -2777,12 +2339,7 @@
         </div>
       </section>
 
-      <section class="chat-card" id="chat" aria-label="GF 的朋友圈与数字分身">
-          <div class="gf-profile">
-            <div class="gf-cover" id="gfCover">
-              <p class="gf-cover-kicker">GF's Life</p>
-              <p class="gf-cover-caption"><span id="gfCoverName">GF / 林春烨</span><span class="gf-cover-dot">·</span>生活记录</p>
-            </div>
+      <section class="chat-card" id="chat" aria-label="数字分身聊天区">
           <header class="chat-head">
             <div class="chat-person">
               <img class="bot-avatar" src="data:image/jpeg;base64,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" alt="gf 的头像" />
@@ -2793,9 +2350,15 @@
             </div>
             <div class="online"><span class="dot"></span> 在线</div>
           </header>
+
+          <div class="messages" id="messages" aria-live="polite">
+            <div class="message">
+              <div class="bubble">你好，我是 gf。准确来说，我不是另一个完整的他，只是把他的经历、兴趣、想法和一些说不清道不明的情绪，拼成了一个可以和你聊天的版本。他大概是个感性和幽默各占一半的人，偶尔抽象，偶尔自恋，有时候想得很多，有时候又懒得解释。喜欢电影、音乐，也喜欢琢磨一些看起来没什么用、但自己觉得挺有意思的事情。你可以和我聊日常、聊理想、聊那些没来由的情绪，也可以什么正经事都不聊。我会尽量像他一样，认真听，认真回应，偶尔开个玩笑。当然，我不是什么都知道。毕竟我只是他的一小部分，而不是他的全部。<br><br>至于我到底有多像他，聊聊看吧。</div>
+            </div>
           </div>
 
           <div class="gf-panel" aria-label="关于 GF 的四个切面">
+            <div class="gf-cover" role="img" aria-label="gf 的背景照片"></div>
             <p class="gf-kicker">Get to know GF</p>
             <ul class="gf-facets">
               <li class="gf-facet">
@@ -2834,81 +2397,11 @@
             <p class="gf-sign">GF · Digital Self Portrait</p>
           </div>
 
-          <div class="twin-side">
-            <section class="moments" aria-labelledby="momentsTitle">
-              <div class="moments-head">
-                <div>
-                  <p class="moments-kicker">Moments</p>
-                  <h3 class="moments-title" id="momentsTitle">朋友圈</h3>
-                </div>
-                <p class="moments-count"><b id="momentsCount">0</b> 条</p>
-              </div>
-              <div class="moments-feed" id="momentsFeed" aria-live="polite"></div>
-            </section>
-
-            <section class="chat-panel" aria-label="和 gf 聊天">
-              <div class="chat-bar">
-                <p class="chat-bar-title">和 <b>gf</b> 聊聊</p>
-                <p class="chat-bar-hint">点一条动态，可以带着它来问</p>
-              </div>
-          <div class="messages" id="messages" aria-live="polite">
-            <div class="message">
-              <div class="bubble">你好，我是 gf。准确来说，我不是另一个完整的他，只是把他的经历、兴趣、想法和一些说不清道不明的情绪，拼成了一个可以和你聊天的版本。他大概是个感性和幽默各占一半的人，偶尔抽象，偶尔自恋，有时候想得很多，有时候又懒得解释。喜欢电影、音乐，也喜欢琢磨一些看起来没什么用、但自己觉得挺有意思的事情。你可以和我聊日常、聊理想、聊那些没来由的情绪，也可以什么正经事都不聊。我会尽量像他一样，认真听，认真回应，偶尔开个玩笑。当然，我不是什么都知道。毕竟我只是他的一小部分，而不是他的全部。<br><br>至于我到底有多像他，聊聊看吧。</div>
-            </div>
-          </div>
-              <div class="moment-context" id="momentContext" hidden>
-                <span class="moment-context-label">正在聊</span>
-                <span class="moment-context-text" id="momentContextText"></span>
-                <button type="button" class="moment-context-clear" id="momentContextClear" aria-label="取消动态上下文">×</button>
-              </div>
           <form class="composer" id="chatForm">
             <input id="question" autocomplete="off" maxlength="100" placeholder="问我点什么吧…" aria-label="输入问题" />
             <button class="send" type="submit" aria-label="发送">↑</button>
           </form>
-            </section>
-          </div>
       </section>
-
-      <!-- 朋友圈数据：只改这里，渲染逻辑在页面底部 -->
-      <script type="application/json" id="gfMomentsData">
-        {
-          "profile": {
-            "name": "GF",
-            "alias": "林春烨",
-            "signature": "没空忧伤",
-            "cover": ""
-          },
-          "moments": [
-            {
-              "id": "demo-text",
-              "date": null,
-              "dateLabel": "时间待填写",
-              "group": "占位示例",
-              "category": "排版示例",
-              "content": "这是一条纯文字动态的排版占位。字号、行距、时间、分类标签都按真实动态来，等你把内容发来后直接替换这里。",
-              "images": [],
-              "tags": [],
-              "visibility": "public",
-              "related_topics": [],
-              "demo": true
-            },
-            {
-              "id": "demo-images",
-              "date": null,
-              "dateLabel": "时间待填写",
-              "group": "占位示例",
-              "category": "排版示例",
-              "content": "这条用来预览多图：真实图片会按原始比例显示，点击可以看大图。下面是三张图片占位。",
-              "images": [],
-              "demoImageCount": 3,
-              "tags": [],
-              "visibility": "public",
-              "related_topics": [],
-              "demo": true
-            }
-          ]
-        }
-      </script>
 
       <section class="hs-section is-dark" id="highschool" aria-labelledby="hsTitle">
         <header class="hs-head">
@@ -3444,8 +2937,7 @@
       input.value = '';
 
       const typing = addTyping();
-      // 朋友圈上下文只发给模型，不写进聊天记录
-      const remote = await fetchTwinReply(withMomentContext(clean));
+      const remote = await fetchTwinReply(clean);
       typing.remove();
 
       const local = answer(clean);
@@ -3472,208 +2964,6 @@
       event.preventDefault();
       ask(input.value);
     });
-
-    /* ---------- 朋友圈（Moments）：数据 → 渲染 → 聊天上下文 ---------- */
-    const momentsFeed = document.querySelector('#momentsFeed');
-    const momentsCount = document.querySelector('#momentsCount');
-    const gfCover = document.querySelector('#gfCover');
-    const gfCoverName = document.querySelector('#gfCoverName');
-    const momentContext = document.querySelector('#momentContext');
-    const momentContextText = document.querySelector('#momentContextText');
-    const momentContextClear = document.querySelector('#momentContextClear');
-    let activeMoment = null;
-
-    let momentsData = { profile: {}, moments: [] };
-    try {
-      const raw = document.querySelector('#gfMomentsData');
-      if (raw) momentsData = JSON.parse(raw.textContent) || momentsData;
-    } catch (err) {
-      console.warn('[moments] 数据解析失败：', err);
-    }
-
-    const momentProfile = momentsData.profile || {};
-    if (gfCover && momentProfile.cover) {
-      gfCover.style.backgroundImage = `url("${String(momentProfile.cover).replace(/"/g, '%22')}")`;
-      gfCover.classList.add('has-cover');
-    }
-    if (gfCoverName) {
-      const coverName = [momentProfile.name, momentProfile.alias].filter(Boolean).join(' / ');
-      if (coverName) gfCoverName.textContent = coverName;
-    }
-    const headSignature = document.querySelector('.chat-head p');
-    if (headSignature && momentProfile.signature) headSignature.textContent = momentProfile.signature;
-
-    const pad2 = value => String(value).padStart(2, '0');
-
-    function timeOf(moment) {
-      if (moment.dateLabel) return moment.dateLabel;
-      if (!moment.date) return '时间待填写';
-      const date = new Date(moment.date);
-      if (Number.isNaN(date.getTime())) return String(moment.date);
-      return `${date.getMonth() + 1}月${date.getDate()}日 ${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
-    }
-
-    function groupOf(moment) {
-      if (moment.group) return moment.group;
-      if (!moment.date) return '更早以前';
-      const date = new Date(moment.date);
-      if (Number.isNaN(date.getTime())) return '更早以前';
-      const now = new Date();
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const day = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-      const diff = Math.round((today - day) / 86400000);
-      if (diff <= 0) return '今天';
-      if (diff === 1) return '昨天';
-      if (diff <= 30) return '近期';
-      return '更早以前';
-    }
-
-    function excerptOf(text) {
-      const clean = String(text || '').replace(/\s+/g, ' ').trim();
-      return clean.length > 36 ? `${clean.slice(0, 36)}…` : clean;
-    }
-
-    function createNode(tag, className, text) {
-      const node = document.createElement(tag);
-      if (className) node.className = className;
-      if (text != null) node.textContent = text;
-      return node;
-    }
-
-    function renderMoment(moment) {
-      const post = createNode('article', 'moment');
-      post.dataset.momentId = moment.id || '';
-
-      const top = createNode('div', 'moment-top');
-      if (moment.category) top.append(createNode('span', 'moment-cat', moment.category));
-      top.append(createNode('time', 'moment-time', timeOf(moment)));
-      if (moment.demo) top.append(createNode('span', 'moment-demo-tag', '占位'));
-      post.append(top);
-
-      if (moment.content) post.append(createNode('p', 'moment-text', moment.content));
-
-      const images = Array.isArray(moment.images) ? moment.images.filter(Boolean) : [];
-      if (images.length) {
-        const media = createNode('div', 'moment-media');
-        media.style.setProperty('--moment-cols', String(Math.min(images.length, 3)));
-        if (images.length === 1) media.classList.add('single');
-        images.slice(0, 9).forEach((src, index) => {
-          const button = createNode('button', 'moment-img-btn');
-          button.type = 'button';
-          button.setAttribute('aria-label', `查看第 ${index + 1} 张图片`);
-          const img = document.createElement('img');
-          img.className = 'moment-img';
-          img.src = src;
-          img.alt = moment.content ? excerptOf(moment.content) : '朋友圈图片';
-          img.loading = 'lazy';
-          button.append(img);
-          button.addEventListener('click', () => openLightbox(src));
-          media.append(button);
-        });
-        post.append(media);
-      } else if (moment.demo && moment.demoImageCount) {
-        const media = createNode('div', 'moment-media');
-        media.style.setProperty('--moment-cols', '3');
-        const total = Math.min(Number(moment.demoImageCount) || 3, 9);
-        for (let index = 0; index < total; index += 1) {
-          media.append(createNode('div', 'moment-img-ph', `图片占位 ${index + 1}`));
-        }
-        post.append(media);
-      }
-
-      if (Array.isArray(moment.tags) && moment.tags.length) {
-        post.append(createNode('p', 'moment-tags', moment.tags.map(tag => `#${tag}`).join('  ')));
-      }
-
-      const foot = createNode('div', 'moment-foot');
-      if (moment.likes != null) foot.append(createNode('span', 'moment-stat', `♡ ${moment.likes}`));
-      if (moment.comments != null) foot.append(createNode('span', 'moment-stat', `评论 ${moment.comments}`));
-      const chatButton = createNode('button', 'moment-chat', '就这条聊聊 →');
-      chatButton.type = 'button';
-      chatButton.addEventListener('click', () => selectMoment(moment, post));
-      foot.append(chatButton);
-      post.append(foot);
-
-      return post;
-    }
-
-    function renderMoments() {
-      if (!momentsFeed) return;
-      const list = (Array.isArray(momentsData.moments) ? momentsData.moments : [])
-        .filter(moment => moment && moment.visibility !== 'private')
-        .slice();
-      list.sort((a, b) => {
-        const timeA = a.date ? Date.parse(a.date) : NaN;
-        const timeB = b.date ? Date.parse(b.date) : NaN;
-        if (Number.isNaN(timeA) && Number.isNaN(timeB)) return 0;
-        if (Number.isNaN(timeA)) return -1;
-        if (Number.isNaN(timeB)) return 1;
-        return timeB - timeA;
-      });
-
-      if (momentsCount) momentsCount.textContent = String(list.length);
-      momentsFeed.innerHTML = '';
-
-      if (!list.length) {
-        momentsFeed.append(createNode('p', 'moments-empty', '朋友圈内容整理中。'));
-        return;
-      }
-
-      if (list.some(moment => moment.demo)) {
-        momentsFeed.append(createNode('p', 'moments-note', '以下为排版占位，等你把真实动态发来后替换。'));
-      }
-
-      let currentGroup = null;
-      list.forEach(moment => {
-        const group = groupOf(moment);
-        if (group !== currentGroup) {
-          momentsFeed.append(createNode('p', 'moment-group-title', group));
-          currentGroup = group;
-        }
-        momentsFeed.append(renderMoment(moment));
-      });
-    }
-
-    function selectMoment(moment, post) {
-      activeMoment = moment;
-      if (momentContext && momentContextText) {
-        momentContextText.textContent = excerptOf(moment.content) || '这条动态';
-        momentContext.hidden = false;
-      }
-      momentsFeed.querySelectorAll('.moment.is-active').forEach(node => node.classList.remove('is-active'));
-      if (post) post.classList.add('is-active');
-      if (input) {
-        input.placeholder = '想问这条动态的什么？';
-        input.focus({ preventScroll: true });
-      }
-      const panel = document.querySelector('.chat-panel');
-      if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      window.setTimeout(() => { if (input) input.focus({ preventScroll: true }); }, 360);
-    }
-
-    function clearMomentContext() {
-      activeMoment = null;
-      if (momentContext) momentContext.hidden = true;
-      if (momentContextText) momentContextText.textContent = '';
-      if (momentsFeed) momentsFeed.querySelectorAll('.moment.is-active').forEach(node => node.classList.remove('is-active'));
-      if (input) input.placeholder = '问我点什么吧…';
-    }
-
-    function withMomentContext(question) {
-      if (!activeMoment) return question;
-      const bits = [
-        timeOf(activeMoment),
-        activeMoment.category,
-        ...(Array.isArray(activeMoment.tags) ? activeMoment.tags : [])
-      ].filter(Boolean);
-      const meta = bits.length ? `（${bits.join(' · ')}）` : '';
-      const topics = Array.isArray(activeMoment.related_topics) ? activeMoment.related_topics : [];
-      const topicLine = topics.length ? `相关主题：${topics.join('、')}\n` : '';
-      return `【朋友圈动态${meta}】\n${activeMoment.content}\n${topicLine}\n访客从这条动态点进来提问，请结合这条动态回答，不要编造动态之外的事实。\n\n访客的问题：${question}`;
-    }
-
-    if (momentContextClear) momentContextClear.addEventListener('click', clearMomentContext);
-    renderMoments();
   </script>
 <script>
   (function () {
